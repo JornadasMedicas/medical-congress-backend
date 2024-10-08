@@ -1,11 +1,11 @@
 import { Response } from "express";
 import nodemailer from "nodemailer";
-import { PropsSendMailInterface } from "../interfaces/Contact";
+import { PropsSendContactMailInterface } from "../interfaces/IContact";
 import SMTPTransport from "nodemailer/lib/smtp-transport";
 
 export const sendContactMail = async (req: any, res: Response) => {
     try {
-        const data: PropsSendMailInterface = req.body;        
+        const data: PropsSendContactMailInterface = req.body;
 
         const transporter = nodemailer.createTransport({
             name: "cae",

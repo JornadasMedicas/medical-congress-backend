@@ -1,4 +1,4 @@
-export interface PropsSendMailInterface {
+export interface PropsSendContactMailInterface {
     nombre: string;
     telefono: number;
     correo: string;

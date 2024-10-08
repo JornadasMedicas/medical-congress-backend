@@ -6,6 +6,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
 const base_1 = __importDefault(require("../routes/base"));
+const contact_1 = __importDefault(require("../routes/contact"));
+const register_1 = __importDefault(require("../routes/register"));
 class Server {
     constructor() {
         //express server
@@ -17,12 +19,13 @@ class Server {
     middlewares() {
         this.app.use(express_1.default.json());
         this.app.use((0, cors_1.default)({
-            origin: '*', // all domains allowed use *
+            origin: '*',
             methods: ['GET', 'POST'],
             allowedHeaders: ['Content-Type', 'Authorization']
         }));
         this.app.use('/', base_1.default);
-        this.app.use('/api', routeVacation);
+        this.app.use('/api/contact', contact_1.default);
+        this.app.use('/api/register', register_1.default);
     }
     execute() {
         this.middlewares();

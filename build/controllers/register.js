@@ -12,11 +12,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.sendContactMail = void 0;
+exports.sendRegistMail = void 0;
 const nodemailer_1 = __importDefault(require("nodemailer"));
-const sendContactMail = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const qrcode_1 = __importDefault(require("qrcode"));
+const path_1 = __importDefault(require("path"));
+const sendRegistMail = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const data = req.body;
+        const rutaQr = path_1.default.join(__dirname, `../../public/${data.correo}.png`);
+        qrcode_1.default.toFile(rutaQr, 'hola');
         const transporter = nodemailer_1.default.createTransport({
             name: "cae",
             host: "smtp.gmail.com",
@@ -30,21 +34,19 @@ const sendContactMail = (req, res) => __awaiter(void 0, void 0, void 0, function
                 rejectUnauthorized: false
             }
         });
-        const info = yield transporter.sendMail({
-            from: `"Centro de Alta Especialidad Dr. Rafael Lucio" <${process.env.EMAIL_CONTACTO}>`,
-            to: `${process.env.EMAIL_CONTACTO}`,
-            subject: 'SOLICITUD: ' + data.asunto,
+        console.log(__dirname);
+        /* const info: SMTPTransport.SentMessageInfo = await transporter.sendMail({
+            from: `"Centro de Alta Especialidad Dr. Rafael Lucio" <${process.env.EMAIL_CONTACTO}>`, // sender address
+            to: `${process.env.EMAIL_CONTACTO}`, // main receiver
+            subject: 'PASE DE ENTRADA', // Subject line
             text: `
-            Solicitante: ${data.nombre}\n
-            Teléfono: ${data.telefono}\n
-            Correo: ${data.correo}\n\n
-            ${data.descripcion}
+            Estimado ${data.acronimo + data.nombres + ' ' + data.apellidos}, el Centro de Alta Especialidad Dr. Rafael Lucio agradece su participación en las Jornadas Médicas 2024.\n A continuación se muestra adjunto su código QR el cuál deberá descargar y presentar antes de ingresar al evento para registrar su asistencia.
             `
-        });
+        }); */
         res.status(200).json({
             ok: true,
             msg: 'Message Sent',
-            data: info.response
+            data: 'ok'
         });
     }
     catch (error) {
@@ -55,4 +57,4 @@ const sendContactMail = (req, res) => __awaiter(void 0, void 0, void 0, function
         });
     }
 });
-exports.sendContactMail = sendContactMail;
+exports.sendRegistMail = sendRegistMail;

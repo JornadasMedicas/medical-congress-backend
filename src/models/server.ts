@@ -2,7 +2,8 @@ import express, { Express } from 'express';
 import { Server as HttpServer } from 'http';
 import cors from 'cors';
 import routerBase from '../routes/base';
-import routeContact from '../routes/contact'
+import routeContact from '../routes/contact';
+import routeRegist from '../routes/register';
 
 class Server {
     private app: Express;
@@ -28,6 +29,7 @@ class Server {
         }));
         this.app.use( '/', routerBase );
         this.app.use('/api/contact', routeContact);
+        this.app.use('/api/register', routeRegist);
     }
 
     execute() {
