@@ -6,5 +6,3 @@ const router: Router = Router();
 router.post('/mail', sendRegistMail);
 
 export default router;
-
-sendRegistMail
