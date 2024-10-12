@@ -1,0 +1,48 @@
+generator client {
+    provider      = "prisma-client-js"
+    binaryTargets = ["native", "debian-openssl-1.1.x"]
+}
+
+datasource db {
+    provider = "mysql"
+    url      = env("DATABASE_URL")
+}
+
+model jrn_persona {
+    id          Int     @id @unique @default(autoincrement()) @db.UnsignedInt
+    acronimo    String  @db.VarChar(10)
+    nombre      String  @db.VarChar(50)
+    categoria   String  @db.VarChar(50)
+    rfc         String? @db.Char(13)
+    correo      String  @db.VarChar(100)
+    tel         String  @db.Char(10)
+    ciudad      String  @db.VarChar(30)
+    dependencia String? @db.VarChar(50)
+
+    jrn_evento jrn_evento[]
+}
+
+model jrn_edicion {
+    id      Int    @id @unique @default(autoincrement()) @db.UnsignedInt
+    edicion String @db.Char(4)
+}
+
+model jrn_modulos {
+    id Int @id @unique @default(autoincrement()) @db.UnsignedInt
+}
+
+model jrn_talleres {
+    id Int @id @unique @default(autoincrement()) @db.UnsignedInt
+}
+
+model jrn_evento {
+    id               Int     @id @unique @default(autoincrement()) @db.UnsignedInt
+    isAssistDay1     Boolean @default(false) @db.TinyInt()
+    isAssistDay2     Boolean @default(false) @db.TinyInt()
+    isAssistDay3     Boolean @default(false) @db.TinyInt()
+    isConstanciaSend Boolean @default(false) @db.TinyInt()
+
+    id_persona Int @db.UnsignedInt
+
+    jrn_persona jrn_persona @relation(fields: [id_persona], references: [id], onUpdate: Restrict)
+}

@@ -19,8 +19,8 @@ export const sendRegistMail = async (req: any, res: any) => {
             port: 587,
             secure: false, // Use `true` for port 465, `false` for all other ports
             auth: {
-                user: `${process.env.EMAIL_CONTACTO}`,
-                pass: `${process.env.EMAIL_CONTACTO_PASSWORD}`
+                user: `${process.env.EMAIL_REGISTRO}`,
+                pass: `${process.env.EMAIL_REGISTRO_PASSWORD}`
             },
             tls: {
                 rejectUnauthorized: false
@@ -28,7 +28,7 @@ export const sendRegistMail = async (req: any, res: any) => {
         });
 
         const info: SMTPTransport.SentMessageInfo = await transporter.sendMail({
-            from: `"Centro de Alta Especialidad Dr. Rafael Lucio" <${process.env.EMAIL_CONTACTO}>`, // sender address
+            from: `"Centro de Alta Especialidad Dr. Rafael Lucio" <${process.env.EMAIL_REGISTRO}>`, // sender address
             to: `${data.correo}`, // main receiver
             subject: 'JORNADAS MÉDICAS 2024', // Subject line
             text: `Estimado ${data.acronimo + ' ' + data.nombre + ' ' + data.apellidos}, el Centro de Alta Especialidad Dr. Rafael Lucio agradece su participación en las Jornadas Médicas 2024.\nA continuación se muestra adjunto su código QR el cuál deberá descargar y presentar antes de ingresar al evento para registrar su asistencia.
