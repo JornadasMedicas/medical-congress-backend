@@ -5,12 +5,12 @@ export interface WorkshopsFormInterface {
 
 export interface PropsSendRegistMailInterface {
     categoria: string;
-    acronimo: number;
+    acronimo: string;
     nombre: string;
     apellidos: string;
     rfc?: string;
     correo: string;
-    tel: number;
+    tel: string;
     ciudad: string;
     dependencia?: string;
     modulo?: string;

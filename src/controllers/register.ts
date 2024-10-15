@@ -3,17 +3,38 @@ import SMTPTransport from "nodemailer/lib/smtp-transport";
 import { PropsSendRegistMailInterface } from "../interfaces/IRegister";
 import path from 'path';
 import { generateQr } from "../helpers/canvasQrGenerate";
+import { createInsertionQuery } from "../helpers/registerQueries";
 
 export const sendRegistMail = async (req: any, res: any) => {
     try {
         const data: PropsSendRegistMailInterface = req.body;
         const rutaLogo: string = path.join(__dirname, `../../public/cae_logo.png`);
 
-        const rutaQr: string = await generateQr(data, rutaLogo); //generate and save qr code on public folder
+        const response: any = await createInsertionQuery(data);
+
+        if (Object.keys(response).length === 0) {
+            res.status(409).json({
+                ok: false,
+                msg: 'El correo ya ha sido registrado. Intente con uno nuevo'
+            });
+        } else if (response === null) {
+            res.status(400).json({
+                ok: false,
+                msg: 'No se ha podido procesar su solicitud. Intente nuevamente en unos minutos'
+            });
+        } else {
+            res.status(200).json({
+                ok: true,
+                msg: 'ok',
+                data: response
+            });
+        }
+
+        /* const rutaQr: string = await generateQr(data, rutaLogo); //generate and save qr code on public folder */
 
         /* QRCode.toFile(rutaQr, 'mensaje de prueba') */
 
-        const transporter = nodemailer.createTransport({
+        /* const transporter = nodemailer.createTransport({
             name: "cae",
             host: "smtp.gmail.com",
             port: 587,
@@ -39,13 +60,13 @@ export const sendRegistMail = async (req: any, res: any) => {
                     path: rutaQr
                 }
             ]
-        });
+        }); */
 
-        res.status(200).json({
+        /* res.status(200).json({
             ok: true,
             msg: 'Message Sent',
-            data: info.response
-        });
+            data: 'send'
+        }); */
 
     } catch (error) {
         console.log(error);
