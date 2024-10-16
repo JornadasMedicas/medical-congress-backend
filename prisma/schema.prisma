@@ -46,10 +46,10 @@ model jrn_evento {
     isAssistDay2           Boolean   @default(false) @db.TinyInt()
     isAssistDay3           Boolean   @default(false) @db.TinyInt()
     isConstanciaModuloSend Boolean   @default(false) @db.TinyInt()
-    isConstanciaT1Send     Boolean   @default(false) @db.TinyInt()
-    isConstanciaT2Send     Boolean   @default(false) @db.TinyInt()
-    isConstanciaT3Send     Boolean   @default(false) @db.TinyInt()
-    isConstanciaT4Send     Boolean   @default(false) @db.TinyInt()
+    // isConstanciaT1Send     Boolean   @default(false) @db.TinyInt() to be defined
+    // isConstanciaT2Send     Boolean   @default(false) @db.TinyInt()
+    // isConstanciaT3Send     Boolean   @default(false) @db.TinyInt()
+    // isConstanciaT4Send     Boolean   @default(false) @db.TinyInt()
     id_persona             Int       @db.UnsignedInt
     id_edicion             Int       @db.UnsignedInt
     created_at             DateTime? @default(now()) @db.Timestamp(0)

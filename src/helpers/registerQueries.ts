@@ -14,7 +14,6 @@ export const createInsertionQuery = ({ ...props }: PropsSendRegistMailInterface)
             if (repeated) {
                 resolve({}); //duplicated entry
             } else {
-                console.log(props);
                 let record = await db.jrn_persona.create({
                     data: {
                         acronimo: props.acronimo.trim(),
