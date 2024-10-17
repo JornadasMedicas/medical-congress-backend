@@ -35,27 +35,34 @@ model jrn_edicion {
     jrn_evento jrn_evento[]
 }
 
-model jrn_evento {
-    id                     Int       @id @unique @default(autoincrement()) @db.UnsignedInt
-    modulo                 String?   @db.VarChar(50)
-    isRegisteredT1         Boolean   @default(false) @db.TinyInt()
-    isRegisteredT2         Boolean   @default(false) @db.TinyInt()
-    isRegisteredT3         Boolean   @default(false) @db.TinyInt()
-    isRegisteredT4         Boolean   @default(false) @db.TinyInt()
-    isAssistDay1           Boolean   @default(false) @db.TinyInt()
-    isAssistDay2           Boolean   @default(false) @db.TinyInt()
-    isAssistDay3           Boolean   @default(false) @db.TinyInt()
-    isConstanciaModuloSend Boolean   @default(false) @db.TinyInt()
-    // isConstanciaT1Send     Boolean   @default(false) @db.TinyInt() to be defined
-    // isConstanciaT2Send     Boolean   @default(false) @db.TinyInt()
-    // isConstanciaT3Send     Boolean   @default(false) @db.TinyInt()
-    // isConstanciaT4Send     Boolean   @default(false) @db.TinyInt()
-    id_persona             Int       @db.UnsignedInt
-    id_edicion             Int       @db.UnsignedInt
-    created_at             DateTime? @default(now()) @db.Timestamp(0)
-    updated_at             DateTime? @default(now()) @db.Timestamp(0)
-    deleted_at             DateTime? @db.Timestamp(0)
+model jrn_constancias {
+    id               Int     @id @unique @default(autoincrement()) @db.UnsignedInt
+    hoja             String  @db.VarChar(10)
+    folio            String  @db.VarChar(10)
+    nombre           String  @db.VarChar(50)
+    isConstanciaSend Boolean @default(false) @db.TinyInt()
+    id_evento        Int     @db.UnsignedInt
 
-    jrn_persona jrn_persona @relation(fields: [id_persona], references: [id], onUpdate: Restrict)
-    jrn_edicion jrn_edicion @relation(fields: [id_edicion], references: [id], onUpdate: Restrict)
+    jrn_evento jrn_evento @relation(fields: [id_evento], references: [id], onUpdate: Restrict)
+}
+
+model jrn_evento {
+    id             Int       @id @unique @default(autoincrement()) @db.UnsignedInt
+    modulo         String?   @db.VarChar(50)
+    isRegisteredT1 Boolean   @default(false) @db.TinyInt()
+    isRegisteredT2 Boolean   @default(false) @db.TinyInt()
+    isRegisteredT3 Boolean   @default(false) @db.TinyInt()
+    isRegisteredT4 Boolean   @default(false) @db.TinyInt()
+    isAssistDay1   Boolean   @default(false) @db.TinyInt()
+    isAssistDay2   Boolean   @default(false) @db.TinyInt()
+    isAssistDay3   Boolean   @default(false) @db.TinyInt()
+    id_persona     Int       @db.UnsignedInt
+    id_edicion     Int       @db.UnsignedInt
+    created_at     DateTime? @default(now()) @db.Timestamp(0)
+    updated_at     DateTime? @default(now()) @db.Timestamp(0)
+    deleted_at     DateTime? @db.Timestamp(0)
+
+    jrn_constancias jrn_constancias[]
+    jrn_persona     jrn_persona       @relation(fields: [id_persona], references: [id], onUpdate: Restrict)
+    jrn_edicion     jrn_edicion       @relation(fields: [id_edicion], references: [id], onUpdate: Restrict)
 }

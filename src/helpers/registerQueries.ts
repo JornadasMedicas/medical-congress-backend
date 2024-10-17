@@ -25,24 +25,24 @@ export const createInsertionQuery = ({ ...props }: PropsSendRegistMailInterface)
                         ciudad: props.ciudad.trim(),
                         dependencia: props.dependencia === '' ? null : props.dependencia,
                         created_at: moment.utc().subtract(6, 'hour').toISOString(), //gmt -6
-                        updated_at: moment.utc().subtract(6, 'hour').toISOString()
+                        updated_at: moment.utc().subtract(6, 'hour').toISOString(),
+                        jrn_evento: {
+                            create: {
+                                modulo: props.modulo === null ? null : props.modulo!.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase(),
+                                isRegisteredT1: props.t1.checked ? true : false,
+                                isRegisteredT2: props.t2.checked ? true : false,
+                                isRegisteredT3: props.t3.checked ? true : false,
+                                isRegisteredT4: props.t4.checked ? true : false,
+                                id_edicion: 1, //!IMPORTANT Change depends on edition
+                                created_at: moment.utc().subtract(6, 'hour').toISOString(), //gmt -6
+                                updated_at: moment.utc().subtract(6, 'hour').toISOString()
+                            }
+                        }
                     }
                 })
 
                 if (record) { //if person was registered successfully
-                    let eventEntry = await db.jrn_evento.create({
-                        data: {
-                            modulo: props.modulo === null ? null : props.modulo!.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase(),
-                            isRegisteredT1: props.t1.checked ? true : false,
-                            isRegisteredT2: props.t2.checked ? true : false,
-                            isRegisteredT3: props.t3.checked ? true : false,
-                            isRegisteredT4: props.t4.checked ? true : false,
-                            id_persona: record.id,
-                            id_edicion: 1
-                        }
-                    });
-
-                    resolve(eventEntry);
+                    resolve(record);
                 } else {
                     resolve(null);
                 }
