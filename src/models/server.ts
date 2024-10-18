@@ -5,6 +5,7 @@ import cors from 'cors';
 import routerBase from '../routes/base';
 import routeContact from '../routes/contact';
 import routeRegist from '../routes/register';
+import routeAssistants from '../routes/assistants';
 import fs from 'fs';
 
 class Server {
@@ -39,6 +40,7 @@ class Server {
         this.app.use('/', routerBase);
         this.app.use('/api/contact', routeContact);
         this.app.use('/api/register', routeRegist);
+        this.app.use('/api/assistants', routeAssistants)
     }
 
     execute() {

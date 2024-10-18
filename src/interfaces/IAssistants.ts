@@ -5,3 +5,9 @@ export interface PropsGetAssistantsQueries {
     module: string;
     workshop: string;
 }
+
+export interface PropsGetTotalAssistantsQueries {
+    email: string;
+    module: string;
+    workshop: string;
+}
