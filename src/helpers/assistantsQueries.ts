@@ -47,6 +47,34 @@ export const getAssistantsQuery = ({ ...props }: PropsGetAssistantsQueries) => {
     })
 }
 
+export const getAssistantsAutocompleteQuery = (params: { filter: string }) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+
+            let listAssistants = await db.jrn_persona.findMany({
+                where: {
+                    OR: [
+                        { nombre: params.filter ? { contains: params.filter } : {} },
+                        { correo: params.filter ? { contains: params.filter } : {} }
+                    ]
+                },
+                select: {
+                    id: true,
+                    nombre: true,
+                    correo: true,
+                },
+                orderBy: {
+                    id: "desc"
+                }
+            });
+
+            resolve(listAssistants);
+        } catch (error) {
+            reject(error);
+        }
+    })
+}
+
 export const getCountAssistantsQuery = ({ ...props }: PropsGetTotalAssistantsQueries) => {
     return new Promise(async (resolve, reject) => {
         try {
