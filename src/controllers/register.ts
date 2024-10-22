@@ -13,12 +13,12 @@ export const sendRegistMail = async (req: any, res: any) => {
         if (Object.keys(response).length === 0) { //if email is already registered
             res.status(409).json({
                 ok: false,
-                msg: 'El correo ya ha sido registrado. Intente con uno nuevo'
+                msg: 'El correo ya ha sido registrado. Intente con uno nuevo. (409)'
             });
         } else if (response === null) { //if there were no success transactions
             res.status(400).json({
                 ok: false,
-                msg: 'No se ha podido procesar su solicitud. Intente mas tarde'
+                msg: 'No se ha podido procesar su solicitud. Intente mas tarde. (400)'
             });
         } else { //if all transactions were successfully done
             const rutaLogo: string = path.join(__dirname, `../../public/cae_logo.png`);
@@ -63,7 +63,7 @@ export const sendRegistMail = async (req: any, res: any) => {
         console.log(error);
         res.status(500).json({
             ok: false,
-            msg: 'Server error contact the administrator'
+            msg: 'Ha habido un error. Intente de nuevo más tarde. (500)'
         });
     }
 }
