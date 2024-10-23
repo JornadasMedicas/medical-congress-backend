@@ -36,12 +36,15 @@ model jrn_edicion {
 }
 
 model jrn_constancias {
-    id               Int     @id @unique @default(autoincrement()) @db.UnsignedInt
-    hoja             String  @db.VarChar(10)
-    folio            String  @db.VarChar(10)
-    nombre           String  @db.VarChar(50)
-    isConstanciaSend Boolean @default(false) @db.TinyInt()
-    id_evento        Int     @db.UnsignedInt
+    id               Int       @id @unique @default(autoincrement()) @db.UnsignedInt
+    hoja             String?   @db.VarChar(10)
+    folio            String?   @db.VarChar(10)
+    nombre           String?   @db.VarChar(50)
+    isConstanciaSend Boolean   @default(false) @db.TinyInt()
+    id_evento        Int       @db.UnsignedInt
+    created_at       DateTime? @default(now()) @db.Timestamp(0)
+    updated_at       DateTime? @default(now()) @db.Timestamp(0)
+    deleted_at       DateTime? @db.Timestamp(0)
 
     jrn_evento jrn_evento @relation(fields: [id_evento], references: [id], onUpdate: Restrict)
 }

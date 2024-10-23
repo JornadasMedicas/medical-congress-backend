@@ -28,7 +28,7 @@ export const createInsertionQuery = ({ ...props }: PropsSendRegistMailInterface)
                         updated_at: moment.utc().subtract(6, 'hour').toISOString(),
                         jrn_evento: {
                             create: {
-                                modulo: props.modulo === null ? null : props.modulo!.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase(),
+                                modulo: props.modulo === '' ? null : props.modulo!.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase(),
                                 isRegisteredT1: props.t1.checked ? true : false,
                                 isRegisteredT2: props.t2.checked ? true : false,
                                 isRegisteredT3: props.t3.checked ? true : false,
@@ -39,9 +39,70 @@ export const createInsertionQuery = ({ ...props }: PropsSendRegistMailInterface)
                             }
                         }
                     }
-                })
+                });
 
                 if (record) { //if person was registered successfully
+                    let event = await db.jrn_evento.findFirst({
+                        where: { id_persona: record.id }
+                    });
+
+                    if (event) {
+                        if (props.modulo !== '') {
+                            await db.jrn_constancias.create({
+                                data: {
+                                    nombre: 'CONGRESO',
+                                    id_evento: event.id,
+                                    created_at: moment.utc().subtract(6, 'hour').toISOString(), //gmt -6
+                                    updated_at: moment.utc().subtract(6, 'hour').toISOString()
+                                }
+                            });
+                        }
+
+                        if (props.t1.checked) {
+                            await db.jrn_constancias.create({
+                                data: {
+                                    nombre: props.t1.name.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase(),
+                                    id_evento: event.id,
+                                    created_at: moment.utc().subtract(6, 'hour').toISOString(), //gmt -6
+                                    updated_at: moment.utc().subtract(6, 'hour').toISOString()
+                                }
+                            });
+                        }
+
+                        if (props.t2.checked) {
+                            await db.jrn_constancias.create({
+                                data: {
+                                    nombre: props.t2.name.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase(),
+                                    id_evento: event!.id,
+                                    created_at: moment.utc().subtract(6, 'hour').toISOString(), //gmt -6
+                                    updated_at: moment.utc().subtract(6, 'hour').toISOString()
+                                }
+                            });
+                        }
+
+                        if (props.t3.checked) {
+                            await db.jrn_constancias.create({
+                                data: {
+                                    nombre: props.t3.name.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase(),
+                                    id_evento: event.id,
+                                    created_at: moment.utc().subtract(6, 'hour').toISOString(), //gmt -6
+                                    updated_at: moment.utc().subtract(6, 'hour').toISOString()
+                                }
+                            });
+                        }
+
+                        if (props.t4.checked) {
+                            await db.jrn_constancias.create({
+                                data: {
+                                    nombre: props.t4.name.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase(),
+                                    id_evento: event.id,
+                                    created_at: moment.utc().subtract(6, 'hour').toISOString(), //gmt -6
+                                    updated_at: moment.utc().subtract(6, 'hour').toISOString()
+                                }
+                            });
+                        }
+                    }
+
                     resolve(record);
                 } else {
                     resolve(null);
