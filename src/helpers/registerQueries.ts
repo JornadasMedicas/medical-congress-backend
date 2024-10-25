@@ -145,12 +145,12 @@ export const getEmailUsed = (): Promise<number> => {
                     isEmailUsed: 3
                 }
             });
-
             if ((email1 + email2 + email3) >= 300) {
                 resolve(0);
             } else {
                 if (queryEmail.length === 0) {
                     email = 1
+                    resolve(1);
                 } else {
                     if (email1 < 100) {
                         email = 1
