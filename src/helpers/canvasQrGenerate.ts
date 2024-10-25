@@ -19,7 +19,7 @@ export const generateQr = async (data: PropsSendRegistMailInterface, rutaLogo: s
     // Draw qr code in canvas
     ctx.drawImage(qrImg, 0, 0, 250, 250);
 
-    // load logo
+    /* // load logo
     const logo = await loadImage(rutaLogo);
     const logoSize: number = 65;
     const logoX: number = (qrCanvas.width - logoSize) / 2;
@@ -36,7 +36,7 @@ export const generateQr = async (data: PropsSendRegistMailInterface, rutaLogo: s
 
     // Draw logo at middle of qr code
     ctx.drawImage(logo, logoX, logoY, logoSize, logoSize);
-    ctx.restore();
+    ctx.restore(); */
 
     // Save final qr code as image
     const rutaQr = path.join(__dirname, `../../public/${data.correo}.png`);

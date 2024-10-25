@@ -2,7 +2,7 @@ import moment from "moment";
 import { db } from "../utils/db";
 import { PropsSendRegistMailInterface } from "../interfaces/IRegister";
 
-export const createInsertionQuery = ({ ...props }: PropsSendRegistMailInterface) => {
+export const createInsertionQuery = ({ ...props }: PropsSendRegistMailInterface, email: number) => {
     return new Promise(async (resolve, reject) => {
         try {
             const repeated: any = await db.jrn_persona.findFirst({
@@ -34,6 +34,7 @@ export const createInsertionQuery = ({ ...props }: PropsSendRegistMailInterface)
                                 isRegisteredT3: props.t3.checked ? true : false,
                                 isRegisteredT4: props.t4.checked ? true : false,
                                 id_edicion: 1, //!IMPORTANT Change depends on edition
+                                isEmailUsed: email,
                                 created_at: moment.utc().subtract(6, 'hour').toISOString(), //gmt -6
                                 updated_at: moment.utc().subtract(6, 'hour').toISOString()
                             }
@@ -106,6 +107,59 @@ export const createInsertionQuery = ({ ...props }: PropsSendRegistMailInterface)
                     resolve(record);
                 } else {
                     resolve(null);
+                }
+            }
+        } catch (error) {
+            reject(error);
+        }
+    })
+}
+
+export const getEmailUsed = (): Promise<number> => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            let email: number = 1;
+            let queryEmail = await db.jrn_evento.findMany({
+                select: {
+                    isEmailUsed: true
+                },
+                orderBy: {
+                    id: "desc"
+                }
+            });
+
+            let email1 = await db.jrn_evento.count({
+                where: {
+                    isEmailUsed: 1
+                }
+            });
+
+            let email2 = await db.jrn_evento.count({
+                where: {
+                    isEmailUsed: 2
+                }
+            });
+
+            let email3 = await db.jrn_evento.count({
+                where: {
+                    isEmailUsed: 3
+                }
+            });
+
+            if ((email1 + email2 + email3) >= 300) {
+                resolve(0);
+            } else {
+                if (queryEmail.length === 0) {
+                    email = 1
+                } else {
+                    if (email1 < 100) {
+                        email = 1
+                    } else if (email2 < 100) {
+                        email = 2
+                    } else if (email3 < 100) {
+                        email = 3
+                    }
+                    resolve(email);
                 }
             }
         } catch (error) {

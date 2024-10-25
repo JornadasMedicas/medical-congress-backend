@@ -63,6 +63,7 @@ model jrn_evento {
     isAssistT2     Boolean   @default(false) @db.TinyInt()
     isAssistT3     Boolean   @default(false) @db.TinyInt()
     isAssistT4     Boolean   @default(false) @db.TinyInt()
+    isEmailUsed    Int       @db.UnsignedInt
     id_persona     Int       @db.UnsignedInt
     id_edicion     Int       @db.UnsignedInt
     created_at     DateTime? @default(now()) @db.Timestamp(0)
