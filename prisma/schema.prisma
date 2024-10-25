@@ -59,6 +59,10 @@ model jrn_evento {
     isAssistDay1   Boolean   @default(false) @db.TinyInt()
     isAssistDay2   Boolean   @default(false) @db.TinyInt()
     isAssistDay3   Boolean   @default(false) @db.TinyInt()
+    isAssistT1     Boolean   @default(false) @db.TinyInt()
+    isAssistT2     Boolean   @default(false) @db.TinyInt()
+    isAssistT3     Boolean   @default(false) @db.TinyInt()
+    isAssistT4     Boolean   @default(false) @db.TinyInt()
     id_persona     Int       @db.UnsignedInt
     id_edicion     Int       @db.UnsignedInt
     created_at     DateTime? @default(now()) @db.Timestamp(0)

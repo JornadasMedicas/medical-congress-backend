@@ -109,3 +109,114 @@ export const getCountAssistantsQuery = ({ ...props }: PropsGetTotalAssistantsQue
         }
     })
 }
+
+//!IMPORTANT UPDATE EVERY YEAR
+const registerDay1 = moment(`${moment().format('YYYY')}-10-24`);
+const registerDay2 = moment(`${moment().format('YYYY')}-10-25`);
+const registerDay3 = moment(`${moment().format('YYYY')}-10-26`);
+const dateT1 = moment(`${moment().format('YYYY')}-10-23`);
+const dateT2 = moment(`${moment().format('YYYY')}-10-24`);
+const dateT3 = moment(`${moment().format('YYYY')}-10-24`);
+const dateT4 = moment(`${moment().format('YYYY')}-10-25`);
+const dnow = moment(`${moment().format('YYYY')}-${moment().format('MM')}-${moment().format('DD')}`);
+
+export const updateAttendancesQuery = (assistant: { assistant: string }) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            if (dnow.isBefore(registerDay1)) {// if assistance is checked before event begins
+                return resolve({ ok: false, typeError: 2 });
+            }
+
+            const splittedData: string[] = assistant.assistant.split('|');
+
+            const event = await db.jrn_evento.findFirst({
+                where: {
+                    jrn_persona: { correo: splittedData[0] }
+                }
+            });
+
+            if (event) {
+                if (event.modulo !== null) {//if assistant selected a module
+                    if (dnow.isSame(registerDay1)) {
+                        await db.jrn_evento.update({
+                            where: {
+                                id: event.id
+                            },
+                            data: {
+                                isAssistDay1: true
+                            }
+                        });
+                    } else if (dnow.isSame(registerDay2)) {
+                        await db.jrn_evento.update({
+                            where: {
+                                id: event.id
+                            },
+                            data: {
+                                isAssistDay2: true
+                            }
+                        });
+                    } else if (dnow.isSame(registerDay3)) {
+                        await db.jrn_evento.update({
+                            where: {
+                                id: event.id
+                            },
+                            data: {
+                                isAssistDay3: true
+                            }
+                        });
+                    }
+                }
+
+                if (event.isRegisteredT1 && dnow.isSame(dateT1)) {
+                    await db.jrn_evento.update({
+                        where: {
+                            id: event.id
+                        },
+                        data: {
+                            isAssistT1: true
+                        }
+                    });
+                }
+
+                if (event.isRegisteredT2 && dnow.isSame(dateT2)) {
+                    await db.jrn_evento.update({
+                        where: {
+                            id: event.id
+                        },
+                        data: {
+                            isAssistT2: true
+                        }
+                    });
+                }
+
+                if (event.isRegisteredT3 && dnow.isSame(dateT3)) {
+                    await db.jrn_evento.update({
+                        where: {
+                            id: event.id
+                        },
+                        data: {
+                            isAssistT3: true
+                        }
+                    });
+                }
+
+                if (event.isRegisteredT4 && dnow.isSame(dateT4)) {
+                    await db.jrn_evento.update({
+                        where: {
+                            id: event.id
+                        },
+                        data: {
+                            isAssistT4: true
+                        }
+                    });
+                }
+
+                resolve(event);
+            } else {
+                resolve({ ok: false, typeError: 1 });
+            }
+        } catch (error) {
+            reject(error);
+        }
+    })
+}

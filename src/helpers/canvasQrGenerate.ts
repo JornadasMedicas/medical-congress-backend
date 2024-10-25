@@ -10,11 +10,10 @@ export const generateQr = async (data: PropsSendRegistMailInterface, rutaLogo: s
     const ctx = qrCanvas.getContext('2d');
 
     //generate Qr code content
-    const content: string = `${data.correo}|${data.modulo ? data.modulo.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase() : ''}|${data.t1.checked}|${data.t2.checked}|${data.t3.checked}|${data.t4.checked}` //!IMPORTANT - Adjust depends on needs
-    const encoded: string = Buffer.from(content).toString('base64');
+    const content: string = `${data.correo}|`
 
     // Generate Qr code as image
-    const qrImage = await QRCode.toBuffer(encoded, { width: 250, margin: 1 });
+    const qrImage = await QRCode.toBuffer(content, { width: 250, margin: 1 });
     const qrImg = await loadImage(qrImage);
 
     // Draw qr code in canvas

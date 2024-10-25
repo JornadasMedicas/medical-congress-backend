@@ -34,7 +34,7 @@ class Server {
         this.app.use(express.json());
         this.app.use(cors({ //only enable cors if clients will connect from remote domains or ports besides 'origin'
             origin: '*', // all domains allowed use *
-            methods: ['GET', 'POST'],
+            methods: ['GET', 'POST', 'PUT'],
             allowedHeaders: ['Content-Type', 'Authorization']
         }));
         this.app.use('/', routerBase);
