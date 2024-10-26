@@ -1,6 +1,7 @@
 import moment from "moment";
 import { db } from "../utils/db";
 import { PropsGetAssistantsQueries, PropsGetTotalAssistantsQueries } from "../interfaces/IAssistants";
+import { dateT1, dateT2, dateT3, dateT4, dnow, registerDay1, registerDay2, registerDay3 } from "./globalData";
 
 export const getAssistantsQuery = ({ ...props }: PropsGetAssistantsQueries) => {
     return new Promise(async (resolve, reject) => {
@@ -80,7 +81,7 @@ export const getCountAssistantsQuery = ({ ...props }: PropsGetTotalAssistantsQue
         try {
             const currentYear = moment.utc().subtract(6, 'hour').format('YYYY');
 
-            let countListVacation = await db.jrn_persona.count({
+            let countListAssistants = await db.jrn_persona.count({
                 where: {
                     correo: props.email ? { contains: props.email } : {},
                     jrn_evento: {
@@ -98,9 +99,9 @@ export const getCountAssistantsQuery = ({ ...props }: PropsGetTotalAssistantsQue
                 },
             });
 
-            countListVacation ? (
+            countListAssistants ? (
 
-                resolve(countListVacation)
+                resolve(countListAssistants)
 
             ) : resolve(0);
         } catch (error) {
@@ -109,16 +110,6 @@ export const getCountAssistantsQuery = ({ ...props }: PropsGetTotalAssistantsQue
         }
     })
 }
-
-//!IMPORTANT UPDATE EVERY YEAR
-const registerDay1 = moment(`${moment().format('YYYY')}-10-24`);
-const registerDay2 = moment(`${moment().format('YYYY')}-10-25`);
-const registerDay3 = moment(`${moment().format('YYYY')}-10-26`);
-const dateT1 = moment(`${moment().format('YYYY')}-10-23`);
-const dateT2 = moment(`${moment().format('YYYY')}-10-24`);
-const dateT3 = moment(`${moment().format('YYYY')}-10-24`);
-const dateT4 = moment(`${moment().format('YYYY')}-10-25`);
-const dnow = moment(`${moment().format('YYYY')}-${moment().format('MM')}-${moment().format('DD')}`);
 
 export const updateAttendancesQuery = (assistant: { assistant: string }) => {
     return new Promise(async (resolve, reject) => {

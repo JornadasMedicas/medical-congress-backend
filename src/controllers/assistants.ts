@@ -68,7 +68,6 @@ export const updateAttendances = async (req: any, res: Response) => {
                 msg: 'El asistente no se encuentra registrado.'
             });
         } else if (query.typeError === 2) {
-            console.log('p3');
             res.status(400).json({
                 ok: false,
                 msg: 'Aún no es posible registrar asistencias. Espere al día del evento.'

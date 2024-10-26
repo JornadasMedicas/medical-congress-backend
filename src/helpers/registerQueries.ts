@@ -1,6 +1,7 @@
 import moment from "moment";
 import { db } from "../utils/db";
 import { PropsSendRegistMailInterface } from "../interfaces/IRegister";
+import { edition } from "./globalData";
 
 export const createInsertionQuery = ({ ...props }: PropsSendRegistMailInterface, email: number) => {
     return new Promise(async (resolve, reject) => {
@@ -33,7 +34,7 @@ export const createInsertionQuery = ({ ...props }: PropsSendRegistMailInterface,
                                 isRegisteredT2: props.t2.checked ? true : false,
                                 isRegisteredT3: props.t3.checked ? true : false,
                                 isRegisteredT4: props.t4.checked ? true : false,
-                                id_edicion: 1, //!IMPORTANT Change depends on edition
+                                id_edicion: edition, //!IMPORTANT Change depends on edition
                                 isEmailUsed: email,
                                 created_at: moment.utc().subtract(6, 'hour').toISOString(), //gmt -6
                                 updated_at: moment.utc().subtract(6, 'hour').toISOString()
