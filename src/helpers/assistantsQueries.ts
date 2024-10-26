@@ -134,7 +134,8 @@ export const updateAttendancesQuery = (assistant: { assistant: string }) => {
                                 id: event.id
                             },
                             data: {
-                                isAssistDay1: true
+                                isAssistDay1: true,
+                                updated_at: moment.utc().subtract(6, 'hour').toISOString()
                             }
                         });
                     } else if (dnow.isSame(registerDay2)) {
@@ -143,7 +144,8 @@ export const updateAttendancesQuery = (assistant: { assistant: string }) => {
                                 id: event.id
                             },
                             data: {
-                                isAssistDay2: true
+                                isAssistDay2: true,
+                                updated_at: moment.utc().subtract(6, 'hour').toISOString()
                             }
                         });
                     } else if (dnow.isSame(registerDay3)) {
@@ -152,19 +154,49 @@ export const updateAttendancesQuery = (assistant: { assistant: string }) => {
                                 id: event.id
                             },
                             data: {
-                                isAssistDay3: true
+                                isAssistDay3: true,
+                                updated_at: moment.utc().subtract(6, 'hour').toISOString()
                             }
                         });
                     }
+                } else {
+                    resolve({ ok: false, typeError: 3 });
                 }
 
+                resolve(event);
+            } else {
+                resolve({ ok: false, typeError: 1 });
+            }
+        } catch (error) {
+            reject(error);
+        }
+    })
+}
+
+export const updateAttendancesWorkshopsQuery = (assistant: { assistant: string }) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            if (dnow.isBefore(registerDay1)) {// if assistance is checked before event begins
+                return resolve({ ok: false, typeError: 2 });
+            }
+
+            const splittedData: string[] = assistant.assistant.split('|');
+
+            const event = await db.jrn_evento.findFirst({
+                where: {
+                    jrn_persona: { correo: splittedData[0] }
+                }
+            });
+
+            if (event) {
                 if (event.isRegisteredT1 && dnow.isSame(dateT1)) {
                     await db.jrn_evento.update({
                         where: {
                             id: event.id
                         },
                         data: {
-                            isAssistT1: true
+                            isAssistT1: true,
+                            updated_at: moment.utc().subtract(6, 'hour').toISOString()
                         }
                     });
                 }
@@ -175,7 +207,8 @@ export const updateAttendancesQuery = (assistant: { assistant: string }) => {
                             id: event.id
                         },
                         data: {
-                            isAssistT2: true
+                            isAssistT2: true,
+                            updated_at: moment.utc().subtract(6, 'hour').toISOString()
                         }
                     });
                 }
@@ -186,7 +219,8 @@ export const updateAttendancesQuery = (assistant: { assistant: string }) => {
                             id: event.id
                         },
                         data: {
-                            isAssistT3: true
+                            isAssistT3: true,
+                            updated_at: moment.utc().subtract(6, 'hour').toISOString()
                         }
                     });
                 }
@@ -197,7 +231,8 @@ export const updateAttendancesQuery = (assistant: { assistant: string }) => {
                             id: event.id
                         },
                         data: {
-                            isAssistT4: true
+                            isAssistT4: true,
+                            updated_at: moment.utc().subtract(6, 'hour').toISOString()
                         }
                     });
                 }
