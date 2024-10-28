@@ -1,7 +1,7 @@
 import moment from "moment";
 import { db } from "../utils/db";
 import { PropsSendRegistMailInterface } from "../interfaces/IRegister";
-import { edition } from "./globalData";
+import { dnow, edition } from "./globalData";
 
 export const createInsertionQuery = ({ ...props }: PropsSendRegistMailInterface, email: number) => {
     return new Promise(async (resolve, reject) => {
@@ -131,19 +131,31 @@ export const getEmailUsed = (): Promise<number> => {
 
             let email1 = await db.jrn_evento.count({
                 where: {
-                    isEmailUsed: 1
+                    isEmailUsed: 1,
+                    created_at: {
+                        gte: dnow.toISOString(),
+                        lt: dnow.add(1, 'day').toISOString()
+                    }
                 }
             });
 
             let email2 = await db.jrn_evento.count({
                 where: {
-                    isEmailUsed: 2
+                    isEmailUsed: 2,
+                    created_at: {
+                        gte: dnow.toISOString(),
+                        lt: dnow.add(1, 'day').toISOString()
+                    }
                 }
             });
 
             let email3 = await db.jrn_evento.count({
                 where: {
-                    isEmailUsed: 3
+                    isEmailUsed: 3,
+                    created_at: {
+                        gte: dnow.toISOString(),
+                        lt: dnow.add(1, 'day').toISOString()
+                    }
                 }
             });
             if ((email1 + email2 + email3) >= 300) {
