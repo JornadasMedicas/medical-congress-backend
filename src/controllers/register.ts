@@ -35,6 +35,7 @@ export const sendRegistMail = async (req: any, res: any) => {
             } else { //if all transactions were successfully done
                 const rutaLogo: string = path.join(__dirname, `../../public/cae_logo.png`);
                 const rutaQr: string = await generateQr(data, rutaLogo); //generate and save qr code on public folder
+                console.log(email[0].user, email[0].password);
 
                 const transporter = nodemailer.createTransport({
                     name: "cae",
