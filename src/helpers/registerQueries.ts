@@ -3,6 +3,7 @@ import { db } from "../utils/db";
 import { PropsSendRegistMailInterface } from "../interfaces/IRegister";
 import { dnow, edition } from "./globalData";
 
+//SUPPORTS UP TO 4 WORKSHOPS
 export const createInsertionQuery = ({ ...props }: PropsSendRegistMailInterface, email: number) => {
     return new Promise(async (resolve, reject) => {
         try {

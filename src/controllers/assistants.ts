@@ -1,5 +1,5 @@
 import { Response } from "express";
-import { getAssistantsAutocompleteQuery, getAssistantsQuery, getCountAssistantsQuery, updateAttendancesQuery, updateAttendancesWorkshopsQuery } from "../helpers/assistantsQueries";
+import { getAssistantInfoQuery, getAssistantsAutocompleteQuery, getAssistantsQuery, getCountAssistantsQuery, updateAttendancesQuery, updateAttendancesWorkshopsQuery } from "../helpers/assistantsQueries";
 import { PropsGetAssistantsQueries, PropsGetTotalAssistantsQueries } from "../interfaces/IAssistants";
 
 export const getAssistants = async (req: any, res: Response) => {
@@ -10,6 +10,24 @@ export const getAssistants = async (req: any, res: Response) => {
             ok: true,
             msg: 'Ok',
             data: queryAssistants
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            ok: false,
+            msg: 'Server error contact the administrator'
+        });
+    }
+}
+
+export const getAssistantInfo = async (req: any, res: Response) => {
+    try {
+        const email: { email: string } = req.query;
+        let assistant = await getAssistantInfoQuery(email.email);
+        res.status(200).json({
+            ok: true,
+            msg: 'Ok',
+            data: assistant
         });
     } catch (error) {
         console.log(error);

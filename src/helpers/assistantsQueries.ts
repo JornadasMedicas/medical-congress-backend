@@ -48,6 +48,47 @@ export const getAssistantsQuery = ({ ...props }: PropsGetAssistantsQueries) => {
     })
 }
 
+export const getAssistantInfoQuery = (email: string) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            let assistant = await db.jrn_persona.findFirst({
+                where: {
+                    correo: email ? { contains: email } : {}
+                },
+                select: {
+                    id: true,
+                    acronimo: true,
+                    nombre: true,
+                    correo: true,
+                    tel: true,
+                    categoria: true,
+                    ciudad: true,
+                    jrn_evento: {
+                        select: {
+                            modulo: true,
+                            isAssistDay1: true,
+                            isAssistDay2: true,
+                            isAssistDay3: true,
+                            isRegisteredT1: true,
+                            isRegisteredT2: true,
+                            isRegisteredT3: true,
+                            isRegisteredT4: true,
+                            isAssistT1: true,
+                            isAssistT2: true,
+                            isAssistT3: true,
+                            isAssistT4: true,
+                        }
+                    }
+                }
+            });
+
+            resolve(assistant);
+        } catch (error) {
+            reject(error);
+        }
+    })
+}
+
 export const getAssistantsAutocompleteQuery = (params: { filter: string }) => {
     return new Promise(async (resolve, reject) => {
         try {
