@@ -1,7 +1,7 @@
 import moment from "moment";
 import { db } from "../utils/db";
 import { PropsGetAssistantsQueries, PropsGetTotalAssistantsQueries } from "../interfaces/IAssistants";
-import { dateT1, dateT2, dateT3, dateT4, dnow, registerDay1, registerDay2, registerDay3 } from "./globalData";
+import { dateT1, dateT2, dateT3, dateT4, dnow, dnowWorkshops, registerDay1, registerDay2, registerDay3 } from './globalData';
 
 export const getAssistantsQuery = ({ ...props }: PropsGetAssistantsQueries) => {
     return new Promise(async (resolve, reject) => {
@@ -173,10 +173,11 @@ export const updateAttendancesQuery = (assistant: { assistant: string }) => {
     })
 }
 
+//!IMPORTANT UPDATE EVERY YEAR
 export const updateAttendancesWorkshopsQuery = (assistant: { assistant: string }) => {
     return new Promise(async (resolve, reject) => {
         try {
-            if (dnow.isBefore(registerDay1)) {// if assistance is checked before event begins
+            if (dnowWorkshops.isBefore(dateT1)) {// if assistance is checked before event begins
                 return resolve({ ok: false, typeError: 2 });
             }
 
@@ -184,12 +185,16 @@ export const updateAttendancesWorkshopsQuery = (assistant: { assistant: string }
 
             const event = await db.jrn_evento.findFirst({
                 where: {
-                    jrn_persona: { correo: splittedData[0] }
+                    jrn_persona: { correo: splittedData[0] },
+                    OR: [
+                        { isRegisteredT1: true },
+                        { isRegisteredT2: true }
+                    ]
                 }
             });
 
             if (event) {
-                if (event.isRegisteredT1 && dnow.isSame(dateT1)) {
+                if (event.isRegisteredT1 && (dnowWorkshops.isSameOrAfter(dateT1) && dnowWorkshops.isSameOrBefore(dateT2))) {
                     await db.jrn_evento.update({
                         where: {
                             id: event.id
@@ -201,37 +206,13 @@ export const updateAttendancesWorkshopsQuery = (assistant: { assistant: string }
                     });
                 }
 
-                if (event.isRegisteredT2 && dnow.isSame(dateT2)) {
+                if (event.isRegisteredT2 && dnowWorkshops.isSameOrAfter(dateT2)) {
                     await db.jrn_evento.update({
                         where: {
                             id: event.id
                         },
                         data: {
                             isAssistT2: true,
-                            updated_at: moment.utc().subtract(6, 'hour').toISOString()
-                        }
-                    });
-                }
-
-                if (event.isRegisteredT3 && dnow.isSame(dateT3)) {
-                    await db.jrn_evento.update({
-                        where: {
-                            id: event.id
-                        },
-                        data: {
-                            isAssistT3: true,
-                            updated_at: moment.utc().subtract(6, 'hour').toISOString()
-                        }
-                    });
-                }
-
-                if (event.isRegisteredT4 && dnow.isSame(dateT4)) {
-                    await db.jrn_evento.update({
-                        where: {
-                            id: event.id
-                        },
-                        data: {
-                            isAssistT4: true,
                             updated_at: moment.utc().subtract(6, 'hour').toISOString()
                         }
                     });
