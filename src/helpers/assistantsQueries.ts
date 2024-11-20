@@ -155,6 +155,9 @@ export const getCountAssistantsQuery = ({ ...props }: PropsGetTotalAssistantsQue
 export const updateAttendancesQuery = (assistant: { assistant: string }) => {
     return new Promise(async (resolve, reject) => {
         try {
+            console.log('ACTUAL: ',dnow.isBefore(registerDay1), dnow, registerDay1);
+            console.log('OTRO: ',dnow < registerDay1, dnow, registerDay1);
+            
             if (dnow.isBefore(registerDay1)) {// if assistance is checked before event begins
                 return resolve({ ok: false, typeError: 2 });
             }
