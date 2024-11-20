@@ -157,10 +157,6 @@ export const updateAttendancesQuery = (assistant: { assistant: string }) => {
         try {
             console.log('ACTUAL: ',dnow.isBefore(registerDay1), dnow, registerDay1);
             console.log('OTRO: ',dnow < registerDay1, dnow, registerDay1);
-            
-            if (dnow.isBefore(registerDay1)) {// if assistance is checked before event begins
-                return resolve({ ok: false, typeError: 2 });
-            }
 
             const splittedData: string[] = assistant.assistant.split('|');
 
@@ -171,6 +167,11 @@ export const updateAttendancesQuery = (assistant: { assistant: string }) => {
             });
 
             if (event) {
+
+                if (dnow.isBefore(registerDay1)) {// if assistance is checked before event begins
+                    return resolve({ ok: false, typeError: 2 });
+                }
+
                 if (event.modulo !== null) {//if assistant selected a module
                     if (dnow.isSame(registerDay1)) {
                         await db.jrn_evento.update({
