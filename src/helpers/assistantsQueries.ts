@@ -1,7 +1,8 @@
-import moment from "moment";
+import moment from "moment-timezone";
 import { db } from "../utils/db";
 import { PropsGetAssistantsQueries, PropsGetTotalAssistantsQueries } from "../interfaces/IAssistants";
 import { dateT1, dateT2, dateT3, dateT4, dnow, dnowWorkshops, registerDay1, registerDay2, registerDay3 } from './globalData';
+moment.tz.setDefault('America/Mexico_City');
 
 export const getAssistantsQuery = ({ ...props }: PropsGetAssistantsQueries) => {
     return new Promise(async (resolve, reject) => {
