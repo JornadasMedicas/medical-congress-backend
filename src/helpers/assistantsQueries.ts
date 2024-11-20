@@ -1,7 +1,7 @@
 import moment from "moment-timezone";
 import { db } from "../utils/db";
 import { PropsGetAssistantsQueries, PropsGetTotalAssistantsQueries } from "../interfaces/IAssistants";
-import { dateT1, dateT2, dateT3, dateT4, dnow, dnowWorkshops, registerDay1, registerDay2, registerDay3 } from './globalData';
+
 moment.tz.setDefault('America/Mexico_City');
 
 export const getAssistantsQuery = ({ ...props }: PropsGetAssistantsQueries) => {
@@ -156,9 +156,14 @@ export const getCountAssistantsQuery = ({ ...props }: PropsGetTotalAssistantsQue
 export const updateAttendancesQuery = (assistant: { assistant: string }) => {
     return new Promise(async (resolve, reject) => {
         try {
+            const dnow = moment(`${moment().format('YYYY')}-${moment().format('MM')}-${moment().format('DD')}`);
+            const registerDay1 = moment(`${moment().format('YYYY')}-11-21`);
+            const registerDay2 = moment(`${moment().format('YYYY')}-11-22`);
+            const registerDay3 = moment(`${moment().format('YYYY')}-11-23`);
+
             console.log('ACTUAL: ',dnow.isBefore(registerDay1), dnow, registerDay1);
             console.log('OTRO: ',dnow < registerDay1, dnow, registerDay1);
-
+            
             const splittedData: string[] = assistant.assistant.split('|');
 
             const event = await db.jrn_evento.findFirst({
@@ -168,8 +173,7 @@ export const updateAttendancesQuery = (assistant: { assistant: string }) => {
             });
 
             if (event) {
-
-                if (dnow.isBefore(registerDay1)) {// if assistance is checked before event begins
+                if (dnow < registerDay1) {// if assistance is checked before event begins
                     return resolve({ ok: false, typeError: 2 });
                 }
 
@@ -223,6 +227,12 @@ export const updateAttendancesQuery = (assistant: { assistant: string }) => {
 export const updateAttendancesWorkshopsQuery = (assistant: { assistant: string }) => {
     return new Promise(async (resolve, reject) => {
         try {
+            const dateT1 = moment(`${moment().format('YYYY')}-11-22 08:00:00`);
+            const dateT2 = moment(`${moment().format('YYYY')}-11-22 15:30:00`);
+            const dateT3 = moment(`${moment().format('YYYY')}-12-20`);
+            const dateT4 = moment(`${moment().format('YYYY')}-12-20`);
+            const dnowWorkshops = moment();
+
             if (dnowWorkshops.isBefore(dateT1)) {// if assistance is checked before event begins
                 return resolve({ ok: false, typeError: 2 });
             }

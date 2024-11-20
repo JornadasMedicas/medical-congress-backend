@@ -1,7 +1,6 @@
 import moment from "moment";
 import { db } from "../utils/db";
 import { PropsSendRegistMailInterface } from "../interfaces/IRegister";
-import { dnow, edition } from "./globalData";
 
 //SUPPORTS UP TO 4 WORKSHOPS
 export const createInsertionQuery = ({ ...props }: PropsSendRegistMailInterface, email: number) => {
@@ -35,7 +34,7 @@ export const createInsertionQuery = ({ ...props }: PropsSendRegistMailInterface,
                                 isRegisteredT2: props.t2.checked ? true : false,
                                 isRegisteredT3: props.t3.checked ? true : false,
                                 isRegisteredT4: props.t4.checked ? true : false,
-                                id_edicion: edition, //!IMPORTANT Change depends on edition
+                                id_edicion: 1, //!IMPORTANT Change depends on edition
                                 isEmailUsed: email,
                                 created_at: moment.utc().subtract(6, 'hour').toISOString(), //gmt -6
                                 updated_at: moment.utc().subtract(6, 'hour').toISOString()
@@ -120,6 +119,7 @@ export const createInsertionQuery = ({ ...props }: PropsSendRegistMailInterface,
 export const getEmailUsed = (): Promise<number> => {
     return new Promise(async (resolve, reject) => {
         try {
+            const dnow = moment(`${moment().format('YYYY')}-${moment().format('MM')}-${moment().format('DD')}`);
             let email: number = 1;
             let queryEmail = await db.jrn_evento.findMany({
                 select: {
