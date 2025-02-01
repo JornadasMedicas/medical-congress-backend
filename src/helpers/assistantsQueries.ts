@@ -9,7 +9,6 @@ export const getAssistantsQuery = ({ ...props }: PropsGetAssistantsQueries) => {
         try {
             const rowsPerPage = parseInt(props.limit);
             const min = ((parseInt(props.page) + 1) * rowsPerPage) - rowsPerPage;
-            const currentYear = moment.utc().subtract(6, 'hour').format('YYYY');
 
             let listAssistants = await db.jrn_persona.findMany({
                 where: {
@@ -22,7 +21,7 @@ export const getAssistantsQuery = ({ ...props }: PropsGetAssistantsQueries) => {
                             isRegisteredT3: props.workshop === '3' ? true : {},
                             isRegisteredT4: props.workshop === '4' ? true : {},
                             jrn_edicion: {
-                                edicion: currentYear
+                                edicion: props.year
                             }
                         }
                     }
@@ -121,8 +120,6 @@ export const getAssistantsAutocompleteQuery = (params: { filter: string }) => {
 export const getCountAssistantsQuery = ({ ...props }: PropsGetTotalAssistantsQueries) => {
     return new Promise(async (resolve, reject) => {
         try {
-            const currentYear = moment.utc().subtract(6, 'hour').format('YYYY');
-
             let countListAssistants = await db.jrn_persona.count({
                 where: {
                     correo: props.email ? { contains: props.email } : {},
@@ -134,7 +131,7 @@ export const getCountAssistantsQuery = ({ ...props }: PropsGetTotalAssistantsQue
                             isRegisteredT3: props.workshop === '3' ? true : {},
                             isRegisteredT4: props.workshop === '4' ? true : {},
                             jrn_edicion: {
-                                edicion: currentYear
+                                edicion: props.year
                             }
                         }
                     }
@@ -153,17 +150,34 @@ export const getCountAssistantsQuery = ({ ...props }: PropsGetTotalAssistantsQue
     })
 }
 
+export const getEventEditionsQuery = async (): Promise<{ id: number, edicion: string }[]> => {
+    try {
+        let editions = await db.jrn_edicion.findMany({
+            select: {
+                id: true,
+                edicion: true
+            },
+            orderBy: { id: 'desc' }
+        });
+
+        return editions;
+    } catch (error) {
+        console.log('Error fetching event editions', error);
+        throw error;
+    }
+}
+
 export const updateAttendancesQuery = (assistant: { assistant: string }) => {
     return new Promise(async (resolve, reject) => {
         try {
             const dnow = moment(`${moment().format('YYYY')}-${moment().format('MM')}-${moment().format('DD')}`);
-            const registerDay1 = moment(`${moment().format('YYYY')}-11-21`);
-            const registerDay2 = moment(`${moment().format('YYYY')}-11-22`);
-            const registerDay3 = moment(`${moment().format('YYYY')}-11-23`);
+            const registerDay1 = moment(`${moment().format('YYYY')}-11-20`);
+            const registerDay2 = moment(`${moment().format('YYYY')}-11-21`);
+            const registerDay3 = moment(`${moment().format('YYYY')}-11-22`);
 
-            console.log('ACTUAL: ',dnow.isBefore(registerDay1), dnow, registerDay1);
-            console.log('OTRO: ',dnow < registerDay1, dnow, registerDay1);
-            
+            console.log('ACTUAL: ', dnow.isBefore(registerDay1), dnow, registerDay1);
+            console.log('OTRO: ', dnow < registerDay1, dnow, registerDay1);
+
             const splittedData: string[] = assistant.assistant.split('|');
 
             const event = await db.jrn_evento.findFirst({
