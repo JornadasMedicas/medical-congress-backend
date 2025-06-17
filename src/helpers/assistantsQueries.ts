@@ -92,7 +92,6 @@ export const getAssistantInfoQuery = (email: string) => {
 export const getAssistantsAutocompleteQuery = (params: { filter: string }) => {
     return new Promise(async (resolve, reject) => {
         try {
-
             let listAssistants = await db.jrn_persona.findMany({
                 where: {
                     OR: [
@@ -107,7 +106,8 @@ export const getAssistantsAutocompleteQuery = (params: { filter: string }) => {
                 },
                 orderBy: {
                     id: "desc"
-                }
+                },
+                take: 10
             });
 
             resolve(listAssistants);
