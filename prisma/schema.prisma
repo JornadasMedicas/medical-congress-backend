@@ -9,20 +9,30 @@ datasource db {
 }
 
 model jrn_persona {
-    id          Int       @id @unique @default(autoincrement()) @db.UnsignedInt
-    acronimo    String    @db.VarChar(10)
-    nombre      String    @db.VarChar(50)
-    categoria   String    @db.VarChar(50)
-    correo      String    @db.VarChar(100)
-    rfc         String?   @db.Char(13)
-    tel         String    @db.Char(10)
-    ciudad      String    @db.VarChar(30)
-    dependencia String?   @db.VarChar(50)
-    created_at  DateTime? @default(now()) @db.Timestamp(0)
-    updated_at  DateTime? @default(now()) @db.Timestamp(0)
-    deleted_at  DateTime? @db.Timestamp(0)
+    id                     Int                      @id @unique @default(autoincrement()) @db.UnsignedInt
+    acronimo               String                   @db.VarChar(10)
+    nombre                 String                   @db.VarChar(50)
+    categoria              String                   @db.VarChar(50)
+    correo                 String                   @db.VarChar(100)
+    rfc                    String?                  @db.Char(13)
+    tel                    String                   @db.Char(10)
+    ciudad                 String                   @db.VarChar(30)
+    dependencia            String?                  @db.VarChar(50)
+    qr_enviado             Boolean                  @default(false) @db.TinyInt()
+    qr_enviado_at          DateTime?                @db.Timestamp(0)
+    created_at             DateTime?                @default(now()) @db.Timestamp(0)
+    updated_at             DateTime?                @default(now()) @db.Timestamp(0)
+    deleted_at             DateTime?                @db.Timestamp(0)
+    jrn_inscritos_talleres jrn_inscritos_talleres[]
+    jrn_inscritos_modulos  jrn_inscritos_modulos[]
+}
 
-    jrn_evento jrn_evento[]
+model jrn_categorias {
+    id         Int       @id @unique @default(autoincrement()) @db.UnsignedInt
+    nombre     String    @db.VarChar(50)
+    created_at DateTime? @default(now()) @db.Timestamp(0)
+    updated_at DateTime? @default(now()) @db.Timestamp(0)
+    deleted_at DateTime? @db.Timestamp(0)
 }
 
 model jrn_edicion {
@@ -32,45 +42,70 @@ model jrn_edicion {
     updated_at DateTime? @default(now()) @db.Timestamp(0)
     deleted_at DateTime? @db.Timestamp(0)
 
-    jrn_evento jrn_evento[]
+    jrn_talleres          jrn_talleres[]
+    jrn_inscritos_modulos jrn_inscritos_modulos[]
 }
 
-model jrn_constancias {
-    id               Int       @id @unique @default(autoincrement()) @db.UnsignedInt
-    hoja             String?   @db.VarChar(10)
-    folio            String?   @db.VarChar(10)
-    nombre           String?   @db.VarChar(50)
-    isConstanciaSend Boolean   @default(false) @db.TinyInt()
-    id_evento        Int       @db.UnsignedInt
-    created_at       DateTime? @default(now()) @db.Timestamp(0)
-    updated_at       DateTime? @default(now()) @db.Timestamp(0)
-    deleted_at       DateTime? @db.Timestamp(0)
+model jrn_modulos {
+    id         Int       @id @unique @default(autoincrement()) @db.UnsignedInt
+    nombre     String    @db.VarChar(50)
+    created_at DateTime? @default(now()) @db.Timestamp(0)
+    updated_at DateTime? @default(now()) @db.Timestamp(0)
+    deleted_at DateTime? @db.Timestamp(0)
 
-    jrn_evento jrn_evento @relation(fields: [id_evento], references: [id], onUpdate: Restrict)
+    jrn_talleres          jrn_talleres[]
+    jrn_inscritos_modulos jrn_inscritos_modulos[]
 }
 
-model jrn_evento {
-    id             Int       @id @unique @default(autoincrement()) @db.UnsignedInt
-    modulo         String?   @db.VarChar(50)
-    isRegisteredT1 Boolean   @default(false) @db.TinyInt()
-    isRegisteredT2 Boolean   @default(false) @db.TinyInt()
-    isRegisteredT3 Boolean   @default(false) @db.TinyInt()
-    isRegisteredT4 Boolean   @default(false) @db.TinyInt()
-    isAssistDay1   Boolean   @default(false) @db.TinyInt()
-    isAssistDay2   Boolean   @default(false) @db.TinyInt()
-    isAssistDay3   Boolean   @default(false) @db.TinyInt()
-    isAssistT1     Boolean   @default(false) @db.TinyInt()
-    isAssistT2     Boolean   @default(false) @db.TinyInt()
-    isAssistT3     Boolean   @default(false) @db.TinyInt()
-    isAssistT4     Boolean   @default(false) @db.TinyInt()
-    isEmailUsed    Int       @db.UnsignedInt
-    id_persona     Int       @db.UnsignedInt
-    id_edicion     Int       @db.UnsignedInt
-    created_at     DateTime? @default(now()) @db.Timestamp(0)
-    updated_at     DateTime? @default(now()) @db.Timestamp(0)
-    deleted_at     DateTime? @db.Timestamp(0)
+model jrn_talleres {
+    id         Int       @id @unique @default(autoincrement()) @db.UnsignedInt
+    nombre     String    @db.VarChar(50)
+    id_modulo  Int       @db.UnsignedInt
+    id_edicion Int       @db.UnsignedInt
+    created_at DateTime? @default(now()) @db.Timestamp(0)
+    updated_at DateTime? @default(now()) @db.Timestamp(0)
+    deleted_at DateTime? @db.Timestamp(0)
 
-    jrn_constancias jrn_constancias[]
-    jrn_persona     jrn_persona       @relation(fields: [id_persona], references: [id], onUpdate: Restrict)
-    jrn_edicion     jrn_edicion       @relation(fields: [id_edicion], references: [id], onUpdate: Restrict)
+    jrn_modulo             jrn_modulos              @relation(fields: [id_modulo], references: [id], onUpdate: Restrict)
+    jrn_edicion            jrn_edicion              @relation(fields: [id_edicion], references: [id], onUpdate: Restrict)
+    jrn_inscritos_talleres jrn_inscritos_talleres[]
+}
+
+model jrn_inscritos_talleres {
+    id                    Int       @id @unique @default(autoincrement()) @db.UnsignedInt
+    asistio               Boolean   @default(false) @db.TinyInt()
+    fecha                 DateTime  @db.Date
+    hoja                  Int       @db.UnsignedInt
+    folio                 Int       @db.UnsignedInt
+    constancia_enviada    Boolean   @default(false) @db.TinyInt()
+    constancia_enviada_at DateTime? @db.Timestamp(0)
+    id_persona            Int       @db.UnsignedInt
+    id_taller             Int       @db.UnsignedInt
+    created_at            DateTime? @default(now()) @db.Timestamp(0)
+    updated_at            DateTime? @default(now()) @db.Timestamp(0)
+    deleted_at            DateTime? @db.Timestamp(0)
+
+    jrn_persona jrn_persona  @relation(fields: [id_persona], references: [id], onUpdate: Restrict)
+    jrn_taller  jrn_talleres @relation(fields: [id_taller], references: [id], onUpdate: Restrict)
+}
+
+model jrn_inscritos_modulos {
+    id                    Int       @id @unique @default(autoincrement()) @db.UnsignedInt
+    asistioDia1           Boolean   @default(false) @db.TinyInt()
+    asistioDia2           Boolean   @default(false) @db.TinyInt()
+    asistioDia3           Boolean   @default(false) @db.TinyInt()
+    hoja                  Int       @db.UnsignedInt
+    folio                 Int       @db.UnsignedInt
+    constancia_enviada    Boolean   @default(false) @db.TinyInt()
+    constancia_enviada_at DateTime? @db.Timestamp(0)
+    id_persona            Int       @db.UnsignedInt
+    id_modulo             Int       @db.UnsignedInt
+    id_edicion            Int       @db.UnsignedInt
+    created_at            DateTime? @default(now()) @db.Timestamp(0)
+    updated_at            DateTime? @default(now()) @db.Timestamp(0)
+    deleted_at            DateTime? @db.Timestamp(0)
+
+    jrn_persona jrn_persona @relation(fields: [id_persona], references: [id], onUpdate: Restrict)
+    jrn_modulo  jrn_modulos @relation(fields: [id_modulo], references: [id], onUpdate: Restrict)
+    jrn_edicion jrn_edicion @relation(fields: [id_edicion], references: [id], onUpdate: Restrict)
 }
