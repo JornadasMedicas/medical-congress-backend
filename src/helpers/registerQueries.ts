@@ -2,8 +2,7 @@ import moment from "moment";
 import { db } from "../utils/db";
 import { PropsSendRegistMailInterface } from "../interfaces/IRegister";
 
-//SUPPORTS UP TO 4 WORKSHOPS
-export const createInsertionQuery = ({ ...props }: PropsSendRegistMailInterface, email: number) => {
+export const createInsertionQuery = ({ ...props }: PropsSendRegistMailInterface) => {
     return new Promise(async (resolve, reject) => {
         try {
             const repeated: any = await db.jrn_persona.findFirst({
@@ -27,84 +26,25 @@ export const createInsertionQuery = ({ ...props }: PropsSendRegistMailInterface,
                         dependencia: props.dependencia === '' ? null : props.dependencia,
                         created_at: moment.utc().subtract(6, 'hour').toISOString(), //gmt -6
                         updated_at: moment.utc().subtract(6, 'hour').toISOString(),
-                        jrn_evento: {
+                        jrn_inscritos_modulos: {
                             create: {
-                                modulo: props.modulo === '' ? null : props.modulo!.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase(),
-                                isRegisteredT1: props.t1.checked ? true : false,
-                                isRegisteredT2: props.t2.checked ? true : false,
-                                isRegisteredT3: props.t3.checked ? true : false,
-                                isRegisteredT4: props.t4.checked ? true : false,
-                                id_edicion: 1, //!IMPORTANT Change depends on edition
-                                isEmailUsed: email,
-                                created_at: moment.utc().subtract(6, 'hour').toISOString(), //gmt -6
-                                updated_at: moment.utc().subtract(6, 'hour').toISOString()
+                                asistioDia1: false,
+                                asistioDia2: false,
+                                asistioDia3: false,
+                                constancia_enviada: false,
+                                id_edicion: props.id_edicion,
+                                id_modulo: props.id_modulo
+                            }
+                        },
+                        jrn_inscritos_talleres: {
+                            createMany: {
+                                data: props.talleres
                             }
                         }
                     }
                 });
 
                 if (record) { //if person was registered successfully
-                    let event = await db.jrn_evento.findFirst({
-                        where: { id_persona: record.id }
-                    });
-
-                    if (event) {
-                        if (props.modulo !== '') {
-                            await db.jrn_constancias.create({
-                                data: {
-                                    nombre: 'CONGRESO',
-                                    id_evento: event.id,
-                                    created_at: moment.utc().subtract(6, 'hour').toISOString(), //gmt -6
-                                    updated_at: moment.utc().subtract(6, 'hour').toISOString()
-                                }
-                            });
-                        }
-
-                        if (props.t1.checked) {
-                            await db.jrn_constancias.create({
-                                data: {
-                                    nombre: props.t1.name.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase(),
-                                    id_evento: event.id,
-                                    created_at: moment.utc().subtract(6, 'hour').toISOString(), //gmt -6
-                                    updated_at: moment.utc().subtract(6, 'hour').toISOString()
-                                }
-                            });
-                        }
-
-                        if (props.t2.checked) {
-                            await db.jrn_constancias.create({
-                                data: {
-                                    nombre: props.t2.name.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase(),
-                                    id_evento: event!.id,
-                                    created_at: moment.utc().subtract(6, 'hour').toISOString(), //gmt -6
-                                    updated_at: moment.utc().subtract(6, 'hour').toISOString()
-                                }
-                            });
-                        }
-
-                        if (props.t3.checked) {
-                            await db.jrn_constancias.create({
-                                data: {
-                                    nombre: props.t3.name.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase(),
-                                    id_evento: event.id,
-                                    created_at: moment.utc().subtract(6, 'hour').toISOString(), //gmt -6
-                                    updated_at: moment.utc().subtract(6, 'hour').toISOString()
-                                }
-                            });
-                        }
-
-                        if (props.t4.checked) {
-                            await db.jrn_constancias.create({
-                                data: {
-                                    nombre: props.t4.name.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase(),
-                                    id_evento: event.id,
-                                    created_at: moment.utc().subtract(6, 'hour').toISOString(), //gmt -6
-                                    updated_at: moment.utc().subtract(6, 'hour').toISOString()
-                                }
-                            });
-                        }
-                    }
-
                     resolve(record);
                 } else {
                     resolve(null);
@@ -121,18 +61,10 @@ export const getEmailUsed = (): Promise<number> => {
         try {
             const dnow = moment(`${moment().format('YYYY')}-${moment().format('MM')}-${moment().format('DD')}`);
             let email: number = 1;
-            let queryEmail = await db.jrn_evento.findMany({
-                select: {
-                    isEmailUsed: true
-                },
-                orderBy: {
-                    id: "desc"
-                }
-            });
 
-            let email1 = await db.jrn_evento.count({
+            let email1 = await db.jrn_persona.count({
                 where: {
-                    isEmailUsed: 1,
+                    email_registro: `${process.env.EMAIL_REGISTRO}`,
                     created_at: {
                         gte: dnow.toISOString(),
                         lt: dnow.add(1, 'day').toISOString()
@@ -140,9 +72,9 @@ export const getEmailUsed = (): Promise<number> => {
                 }
             });
 
-            let email2 = await db.jrn_evento.count({
+            let email2 = await db.jrn_persona.count({
                 where: {
-                    isEmailUsed: 2,
+                    email_registro: `${process.env.EMAIL_REGISTRO2}`,
                     created_at: {
                         gte: dnow.toISOString(),
                         lt: dnow.add(1, 'day').toISOString()
@@ -150,20 +82,21 @@ export const getEmailUsed = (): Promise<number> => {
                 }
             });
 
-            let email3 = await db.jrn_evento.count({
+            let email3 = await db.jrn_persona.count({
                 where: {
-                    isEmailUsed: 3,
+                    email_registro: `${process.env.EMAIL_REGISTRO3}`,
                     created_at: {
                         gte: dnow.toISOString(),
                         lt: dnow.add(1, 'day').toISOString()
                     }
                 }
             });
+
             if ((email1 + email2 + email3) >= 300) {
                 resolve(0);
             } else {
-                if (queryEmail.length === 0) {
-                    email = 1
+                if ((email1 + email2 + email3) === 0) {
+                    email = 1;
                     resolve(1);
                 } else {
                     if (email1 < 100) {

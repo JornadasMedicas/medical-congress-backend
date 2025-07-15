@@ -9,22 +9,36 @@ export const getAssistantsQuery = ({ ...props }: PropsGetAssistantsQueries) => {
         try {
             const rowsPerPage = parseInt(props.limit);
             const min = ((parseInt(props.page) + 1) * rowsPerPage) - rowsPerPage;
-
+            
             let listAssistants = await db.jrn_persona.findMany({
                 where: {
                     correo: props.email ? { contains: props.email } : {},
-                    jrn_evento: {
-                        some: {
-                            modulo: props.module ? { contains: props.module } : {},
-                            isRegisteredT1: props.workshop === '1' ? true : {},
-                            isRegisteredT2: props.workshop === '2' ? true : {},
-                            isRegisteredT3: props.workshop === '3' ? true : {},
-                            isRegisteredT4: props.workshop === '4' ? true : {},
-                            jrn_edicion: {
-                                edicion: props.year
-                            }
+                    OR: [
+                        {
+                            jrn_inscritos_modulos: {
+                                some: {
+                                    jrn_modulo: {
+                                        nombre: props.module === '' && props.workshop === '' ? {} : props.module,
+                                    },
+                                    jrn_edicion: {
+                                        edicion: props.year
+                                    }
+                                }
+                            },
+                        },
+                        {
+                            jrn_inscritos_talleres: {
+                                some: {
+                                    jrn_taller: {
+                                        id: props.workshop ? parseInt(props.workshop) : 0,
+                                        jrn_edicion: {
+                                            edicion: props.year
+                                        }
+                                    },
+                                }
+                            },
                         }
-                    }
+                    ]
                 },
                 select: {
                     id: true,
@@ -63,20 +77,24 @@ export const getAssistantInfoQuery = (email: string) => {
                     tel: true,
                     categoria: true,
                     ciudad: true,
-                    jrn_evento: {
+                    jrn_inscritos_modulos: {
                         select: {
-                            modulo: true,
-                            isAssistDay1: true,
-                            isAssistDay2: true,
-                            isAssistDay3: true,
-                            isRegisteredT1: true,
-                            isRegisteredT2: true,
-                            isRegisteredT3: true,
-                            isRegisteredT4: true,
-                            isAssistT1: true,
-                            isAssistT2: true,
-                            isAssistT3: true,
-                            isAssistT4: true,
+                            jrn_modulo: {
+                                select: { nombre: true }
+                            },
+                            asistioDia1: true,
+                            asistioDia2: true,
+                            asistioDia3: true
+                        }
+                    },
+                    jrn_inscritos_talleres: {
+                        select: {
+                            asistio: true,
+                            jrn_taller: {
+                                select: {
+                                    nombre: true
+                                }
+                            }
                         }
                     }
                 }
@@ -123,18 +141,32 @@ export const getCountAssistantsQuery = ({ ...props }: PropsGetTotalAssistantsQue
             let countListAssistants = await db.jrn_persona.count({
                 where: {
                     correo: props.email ? { contains: props.email } : {},
-                    jrn_evento: {
-                        some: {
-                            modulo: props.module ? { contains: props.module } : {},
-                            isRegisteredT1: props.workshop === '1' ? true : {},
-                            isRegisteredT2: props.workshop === '2' ? true : {},
-                            isRegisteredT3: props.workshop === '3' ? true : {},
-                            isRegisteredT4: props.workshop === '4' ? true : {},
-                            jrn_edicion: {
-                                edicion: props.year
-                            }
+                    OR: [
+                        {
+                            jrn_inscritos_modulos: {
+                                some: {
+                                    jrn_modulo: {
+                                        nombre: props.module === '' && props.workshop === '' ? {} : props.module,
+                                    },
+                                    jrn_edicion: {
+                                        edicion: props.year
+                                    }
+                                }
+                            },
+                        },
+                        {
+                            jrn_inscritos_talleres: {
+                                some: {
+                                    jrn_taller: {
+                                        id: props.workshop ? parseInt(props.workshop) : 0,
+                                        jrn_edicion: {
+                                            edicion: props.year
+                                        }
+                                    },
+                                }
+                            },
                         }
-                    }
+                    ]
                 },
             });
 
@@ -167,10 +199,44 @@ export const getEventEditionsQuery = async (): Promise<{ id: number, edicion: st
     }
 }
 
+export const getModulesQuery = async (): Promise<{ id: number, nombre: string }[]> => {
+    try {
+        let modules = await db.jrn_modulos.findMany({
+            select: {
+                id: true,
+                nombre: true
+            },
+            orderBy: { id: 'asc' }
+        });
+
+        return modules;
+    } catch (error) {
+        console.log('Error fetching modules', error);
+        throw error;
+    }
+}
+
+export const getWorkshopsQuery = async (): Promise<{ id: number, nombre: string }[]> => {
+    try {
+        let workshops = await db.jrn_talleres.findMany({
+            select: {
+                id: true,
+                nombre: true
+            },
+            orderBy: { id: 'asc' }
+        });
+
+        return workshops;
+    } catch (error) {
+        console.log('Error fetching workshops', error);
+        throw error;
+    }
+}
+
 export const updateAttendancesQuery = (assistant: { assistant: string }) => {
     return new Promise(async (resolve, reject) => {
         try {
-            const dnow = moment(`${moment().format('YYYY')}-${moment().format('MM')}-${moment().format('DD')}`);
+            /* const dnow = moment(`${moment().format('YYYY')}-${moment().format('MM')}-${moment().format('DD')}`);
             const registerDay1 = moment(`${moment().format('YYYY')}-11-20`);
             const registerDay2 = moment(`${moment().format('YYYY')}-11-21`);
             const registerDay3 = moment(`${moment().format('YYYY')}-11-22`);
@@ -180,13 +246,19 @@ export const updateAttendancesQuery = (assistant: { assistant: string }) => {
 
             const splittedData: string[] = assistant.assistant.split('|');
 
-            const event = await db.jrn_evento.findFirst({
+            const isOnCongress = await db.jrn_inscritos_modulos.findFirst({
                 where: {
                     jrn_persona: { correo: splittedData[0] }
                 }
             });
 
-            if (event) {
+            const isOnWorkshop = await db.jrn_inscritos_talleres.findFirst({
+                where: {
+                    jrn_persona: { correo: splittedData[0] }
+                }
+            });
+
+            if (isOnCongress) {
                 if (dnow < registerDay1) {// if assistance is checked before event begins
                     return resolve({ ok: false, typeError: 2 });
                 }
@@ -227,10 +299,12 @@ export const updateAttendancesQuery = (assistant: { assistant: string }) => {
                     resolve({ ok: false, typeError: 3 });
                 }
 
-                resolve(event);
+                resolve(true);
             } else {
                 resolve({ ok: false, typeError: 1 });
-            }
+            } */
+
+            resolve(true);
         } catch (error) {
             reject(error);
         }
@@ -241,7 +315,7 @@ export const updateAttendancesQuery = (assistant: { assistant: string }) => {
 export const updateAttendancesWorkshopsQuery = (assistant: { assistant: string }) => {
     return new Promise(async (resolve, reject) => {
         try {
-            const dateT1 = moment(`${moment().format('YYYY')}-11-22 08:00:00`);
+            /* const dateT1 = moment(`${moment().format('YYYY')}-11-22 08:00:00`);
             const dateT2 = moment(`${moment().format('YYYY')}-11-22 15:30:00`);
             const dateT3 = moment(`${moment().format('YYYY')}-12-20`);
             const dateT4 = moment(`${moment().format('YYYY')}-12-20`);
@@ -291,7 +365,9 @@ export const updateAttendancesWorkshopsQuery = (assistant: { assistant: string }
                 resolve(event);
             } else {
                 resolve({ ok: false, typeError: 1 });
-            }
+            } */
+
+            resolve(true)
         } catch (error) {
             reject(error);
         }

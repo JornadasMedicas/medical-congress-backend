@@ -20,6 +20,8 @@ model jrn_persona {
     dependencia            String?                  @db.VarChar(50)
     qr_enviado             Boolean                  @default(false) @db.TinyInt()
     qr_enviado_at          DateTime?                @db.Timestamp(0)
+    email_registro         String?                  @db.VarChar(50)
+    email_constancia       String?                  @db.VarChar(50)
     created_at             DateTime?                @default(now()) @db.Timestamp(0)
     updated_at             DateTime?                @default(now()) @db.Timestamp(0)
     deleted_at             DateTime?                @db.Timestamp(0)
@@ -38,6 +40,9 @@ model jrn_categorias {
 model jrn_edicion {
     id         Int       @id @unique @default(autoincrement()) @db.UnsignedInt
     edicion    String    @db.Char(4)
+    fec_dia_1  DateTime  @db.Date()
+    fec_dia_2  DateTime  @db.Date()
+    fec_dia_3  DateTime  @db.Date()
     created_at DateTime? @default(now()) @db.Timestamp(0)
     updated_at DateTime? @default(now()) @db.Timestamp(0)
     deleted_at DateTime? @db.Timestamp(0)
@@ -58,13 +63,16 @@ model jrn_modulos {
 }
 
 model jrn_talleres {
-    id         Int       @id @unique @default(autoincrement()) @db.UnsignedInt
-    nombre     String    @db.VarChar(50)
-    id_modulo  Int       @db.UnsignedInt
-    id_edicion Int       @db.UnsignedInt
-    created_at DateTime? @default(now()) @db.Timestamp(0)
-    updated_at DateTime? @default(now()) @db.Timestamp(0)
-    deleted_at DateTime? @db.Timestamp(0)
+    id          Int       @id @unique @default(autoincrement()) @db.UnsignedInt
+    nombre      String    @db.VarChar(50)
+    fecha       DateTime  @db.Date
+    hora_inicio DateTime  @db.Time()
+    hora_fin    DateTime  @db.Time()
+    id_modulo   Int       @db.UnsignedInt
+    id_edicion  Int       @db.UnsignedInt
+    created_at  DateTime? @default(now()) @db.Timestamp(0)
+    updated_at  DateTime? @default(now()) @db.Timestamp(0)
+    deleted_at  DateTime? @db.Timestamp(0)
 
     jrn_modulo             jrn_modulos              @relation(fields: [id_modulo], references: [id], onUpdate: Restrict)
     jrn_edicion            jrn_edicion              @relation(fields: [id_edicion], references: [id], onUpdate: Restrict)
@@ -74,9 +82,8 @@ model jrn_talleres {
 model jrn_inscritos_talleres {
     id                    Int       @id @unique @default(autoincrement()) @db.UnsignedInt
     asistio               Boolean   @default(false) @db.TinyInt()
-    fecha                 DateTime  @db.Date
-    hoja                  Int       @db.UnsignedInt
-    folio                 Int       @db.UnsignedInt
+    hoja                  Int?      @db.UnsignedInt
+    folio                 Int?      @db.UnsignedInt
     constancia_enviada    Boolean   @default(false) @db.TinyInt()
     constancia_enviada_at DateTime? @db.Timestamp(0)
     id_persona            Int       @db.UnsignedInt
@@ -94,8 +101,8 @@ model jrn_inscritos_modulos {
     asistioDia1           Boolean   @default(false) @db.TinyInt()
     asistioDia2           Boolean   @default(false) @db.TinyInt()
     asistioDia3           Boolean   @default(false) @db.TinyInt()
-    hoja                  Int       @db.UnsignedInt
-    folio                 Int       @db.UnsignedInt
+    hoja                  Int?      @db.UnsignedInt
+    folio                 Int?      @db.UnsignedInt
     constancia_enviada    Boolean   @default(false) @db.TinyInt()
     constancia_enviada_at DateTime? @db.Timestamp(0)
     id_persona            Int       @db.UnsignedInt

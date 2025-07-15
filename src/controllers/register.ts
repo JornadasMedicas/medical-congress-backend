@@ -17,7 +17,7 @@ export const sendRegistMail = async (req: any, res: any) => {
                 msg: 'El limite de registros diarios se ha alcanzado. Intente de nuevo mañana.'
             });
         } else {
-            const response: any = await createInsertionQuery(data, emailNumber);
+            const response: any = await createInsertionQuery(data);
             const email = infoEmails.filter((item: any) => {
                 return item.email === emailNumber;
             });
