@@ -1,8 +1,9 @@
 import { Router } from "express";
-import { getCountCatalogs } from "../controllers/admin";
+import { createEditon, getCountCatalogs } from "../controllers/admin";
 
 const router: Router = Router();
 
 router.get('/countCatalogs', getCountCatalogs);
+router.post('/createEdition', createEditon);
 
 export default router;

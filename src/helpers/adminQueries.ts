@@ -1,3 +1,4 @@
+import moment from "moment";
 import { db } from "../utils/db";
 
 export const getCountCatalogsQuery = () => {
@@ -35,6 +36,25 @@ export const getCountCatalogsQuery = () => {
             })
         } catch (error) {
             console.log(error);
+            reject(error);
+        }
+    })
+}
+
+export const createEditionQuery = ({ ...props }: { edicion: string, fec_inicial: string, fec_final: string }) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            let res = await db.jrn_edicion.create({
+                data: {
+                    edicion: props.edicion,
+                    fec_dia_1: moment(props.fec_inicial).toISOString(),
+                    fec_dia_2: moment(props.fec_inicial).add(1, 'day').toISOString(),
+                    fec_dia_3: moment(props.fec_final).toISOString()
+                }
+            });
+            
+            resolve(res);
+        } catch (error) {
             reject(error);
         }
     })
