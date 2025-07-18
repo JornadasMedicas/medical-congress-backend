@@ -63,11 +63,30 @@ export const createEditionQuery = ({ ...props }: { edicion: string, fec_inicial:
 export const createModuleQuery = (nombre: string) => {
     return new Promise(async (resolve, reject) => {
         try {
-            let res = await db.jrn_modulos.create({
-                data: {
-                    nombre
+            let res: any = {};
+            let duplicated = await db.jrn_modulos.findUnique({
+                where: {
+                    nombre,
+                    deleted_at: { not: null }
                 }
             });
+
+            if (duplicated) {
+                res = await db.jrn_modulos.update({
+                    where: {
+                        nombre
+                    },
+                    data: {
+                        deleted_at: null
+                    }
+                });
+            } else {
+                res = await db.jrn_modulos.create({
+                    data: {
+                        nombre
+                    }
+                });
+            }
 
             resolve(res);
         } catch (error) {
