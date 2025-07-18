@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { createEditionQuery, getCountCatalogsQuery } from "../helpers/adminQueries";
+import { createEditionQuery, createModuleQuery, deleteModuleQuery, editModuleQuery, getCountCatalogsQuery } from "../helpers/adminQueries";
 
 export const getCountCatalogs = async (req: any, res: Response) => {
     try {
@@ -33,5 +33,54 @@ export const createEditon = async (req: any, res: Response) => {
                 msg: 'Server error contact the administrator'
             });
         }
+    }
+}
+
+export const createModule = async (req: any, res: Response) => {
+    try {
+        let { nombre } = req.body;
+        let reg = await createModuleQuery(nombre);
+
+        res.status(200).json(reg);
+    } catch (error: any) {
+        if (error.code === 'P2002') {
+            res.status(409).json({
+                ok: false,
+                msg: `El módulo ${req.body.nombre} ya ha sido registrado.`
+            });
+        } else {
+            res.status(500).json({
+                ok: false,
+                msg: 'Server error contact the administrator'
+            });
+        }
+    }
+}
+
+export const editModule = async (req: any, res: Response) => {
+    try {
+        let params = req.body;
+        let reg = await editModuleQuery(params);
+
+        res.status(200).json(reg);
+    } catch (error: any) {
+        res.status(500).json({
+            ok: false,
+            msg: 'Server error contact the administrator'
+        });
+    }
+}
+
+export const deleteModule = async (req: any, res: Response) => {
+    try {        
+        let { id } = req.params;
+        let reg = await deleteModuleQuery(parseInt(id));
+
+        res.status(200).json(reg);
+    } catch (error: any) {
+        res.status(500).json({
+            ok: false,
+            msg: 'Server error contact the administrator'
+        });
     }
 }

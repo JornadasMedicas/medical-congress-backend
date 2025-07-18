@@ -52,7 +52,62 @@ export const createEditionQuery = ({ ...props }: { edicion: string, fec_inicial:
                     fec_dia_3: moment(props.fec_final).toISOString()
                 }
             });
-            
+
+            resolve(res);
+        } catch (error) {
+            reject(error);
+        }
+    })
+}
+
+export const createModuleQuery = (nombre: string) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            let res = await db.jrn_modulos.create({
+                data: {
+                    nombre
+                }
+            });
+
+            resolve(res);
+        } catch (error) {
+            reject(error);
+        }
+    })
+}
+
+export const editModuleQuery = ({ ...props }: { id: number, nombre: string }) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            let res = await db.jrn_modulos.update({
+                where: {
+                    id: props.id
+                },
+                data: {
+                    nombre: props.nombre,
+                    updated_at: moment.utc().subtract(6, 'hour').toISOString()
+                }
+            });
+
+            resolve(res);
+        } catch (error) {
+            reject(error);
+        }
+    })
+}
+
+export const deleteModuleQuery = (id: number) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            let res = await db.jrn_modulos.update({
+                where: {
+                    id
+                },
+                data: {
+                    deleted_at: moment.utc().subtract(6, 'hour').toISOString()
+                }
+            });
+
             resolve(res);
         } catch (error) {
             reject(error);

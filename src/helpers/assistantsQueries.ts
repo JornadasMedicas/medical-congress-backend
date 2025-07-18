@@ -9,7 +9,7 @@ export const getAssistantsQuery = ({ ...props }: PropsGetAssistantsQueries) => {
         try {
             const rowsPerPage = parseInt(props.limit);
             const min = ((parseInt(props.page) + 1) * rowsPerPage) - rowsPerPage;
-            
+
             let listAssistants = await db.jrn_persona.findMany({
                 where: {
                     correo: props.email ? { contains: props.email } : {},
@@ -185,6 +185,9 @@ export const getCountAssistantsQuery = ({ ...props }: PropsGetTotalAssistantsQue
 export const getEventEditionsQuery = async (): Promise<{ id: number, edicion: string }[]> => {
     try {
         let editions = await db.jrn_edicion.findMany({
+            where: {
+                deleted_at: null
+            },
             select: {
                 id: true,
                 edicion: true
@@ -202,9 +205,14 @@ export const getEventEditionsQuery = async (): Promise<{ id: number, edicion: st
 export const getModulesQuery = async (): Promise<{ id: number, nombre: string }[]> => {
     try {
         let modules = await db.jrn_modulos.findMany({
+            where: {
+                deleted_at: null
+            },
             select: {
                 id: true,
-                nombre: true
+                nombre: true,
+                created_at: true,
+                updated_at: true
             },
             orderBy: { id: 'asc' }
         });
@@ -219,6 +227,9 @@ export const getModulesQuery = async (): Promise<{ id: number, nombre: string }[
 export const getWorkshopsQuery = async (): Promise<{ id: number, nombre: string }[]> => {
     try {
         let workshops = await db.jrn_talleres.findMany({
+            where: {
+                deleted_at: null
+            },
             select: {
                 id: true,
                 nombre: true
