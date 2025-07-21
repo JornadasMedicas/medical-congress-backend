@@ -61,6 +61,28 @@ export const createEditionQuery = ({ ...props }: { edicion: string, fec_inicial:
     })
 }
 
+export const getModulesQuery = async (): Promise<{ id: number, nombre: string }[]> => {
+    try {
+        let modules = await db.jrn_modulos.findMany({
+            where: {
+                deleted_at: null
+            },
+            select: {
+                id: true,
+                nombre: true,
+                created_at: true,
+                updated_at: true
+            },
+            orderBy: { id: 'asc' }
+        });
+
+        return modules;
+    } catch (error) {
+        console.log('Error fetching modules', error);
+        throw error;
+    }
+}
+
 export const createModuleQuery = (nombre: string) => {
     return new Promise(async (resolve, reject) => {
         try {
@@ -136,6 +158,26 @@ export const deleteModuleQuery = (id: number) => {
     })
 }
 
+export const getWorkshopsQuery = async (): Promise<{ id: number, nombre: string }[]> => {
+    try {
+        let workshops = await db.jrn_talleres.findMany({
+            where: {
+                deleted_at: null
+            },
+            select: {
+                id: true,
+                nombre: true
+            },
+            orderBy: { id: 'asc' }
+        });
+
+        return workshops;
+    } catch (error) {
+        console.log('Error fetching workshops', error);
+        throw error;
+    }
+}
+
 export const createWorkshopQuery = ({ ...props }: PayloadWorkshops) => {
     return new Promise(async (resolve, reject) => {
         try {
@@ -188,4 +230,24 @@ export const createWorkshopQuery = ({ ...props }: PayloadWorkshops) => {
             reject(error);
         }
     })
+}
+
+export const getEventEditionsQuery = async (): Promise<{ id: number, edicion: string }[]> => {
+    try {
+        let editions = await db.jrn_edicion.findMany({
+            where: {
+                deleted_at: null
+            },
+            select: {
+                id: true,
+                edicion: true
+            },
+            orderBy: { id: 'desc' }
+        });
+
+        return editions;
+    } catch (error) {
+        console.log('Error fetching event editions', error);
+        throw error;
+    }
 }

@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { createEditionQuery, createModuleQuery, createWorkshopQuery, deleteModuleQuery, editModuleQuery, getCountCatalogsQuery } from "../helpers/adminQueries";
+import { createEditionQuery, createModuleQuery, createWorkshopQuery, deleteModuleQuery, editModuleQuery, getCountCatalogsQuery, getEventEditionsQuery, getModulesQuery, getWorkshopsQuery } from "../helpers/adminQueries";
 
 export const getCountCatalogs = async (req: any, res: Response) => {
     try {
@@ -33,6 +33,20 @@ export const createEditon = async (req: any, res: Response) => {
                 msg: 'Server error contact the administrator'
             });
         }
+    }
+}
+
+export const getModules = async (req: any, res: Response) => {
+    try {
+        let modules = await getModulesQuery();
+
+        res.status(200).json(modules)
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            ok: false,
+            msg: 'Server error contact the administrator'
+        });
     }
 }
 
@@ -85,6 +99,20 @@ export const deleteModule = async (req: any, res: Response) => {
     }
 }
 
+export const getWorkshops = async (req: any, res: Response) => {
+    try {
+        let workshops = await getWorkshopsQuery();
+        
+        res.status(200).json(workshops)
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            ok: false,
+            msg: 'Server error contact the administrator'
+        });
+    }
+}
+
 export const createWorkshop = async (req: any, res: Response) => {
     try {
         let params = req.body;
@@ -103,5 +131,19 @@ export const createWorkshop = async (req: any, res: Response) => {
                 msg: 'Server error contact the administrator'
             });
         }
+    }
+}
+
+export const getEventEditions = async (req: any, res: Response) => {
+    try {
+        let eventEditions = await getEventEditionsQuery();
+
+        res.status(200).json(eventEditions)
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            ok: false,
+            msg: 'Server error contact the administrator'
+        });
     }
 }

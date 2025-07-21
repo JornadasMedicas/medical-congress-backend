@@ -182,26 +182,6 @@ export const getCountAssistantsQuery = ({ ...props }: PropsGetTotalAssistantsQue
     })
 }
 
-export const getEventEditionsQuery = async (): Promise<{ id: number, edicion: string }[]> => {
-    try {
-        let editions = await db.jrn_edicion.findMany({
-            where: {
-                deleted_at: null
-            },
-            select: {
-                id: true,
-                edicion: true
-            },
-            orderBy: { id: 'desc' }
-        });
-
-        return editions;
-    } catch (error) {
-        console.log('Error fetching event editions', error);
-        throw error;
-    }
-}
-
 export const getModulesQuery = async (): Promise<{ id: number, nombre: string }[]> => {
     try {
         let modules = await db.jrn_modulos.findMany({

@@ -1,5 +1,5 @@
 import { Response } from "express";
-import { getAssistantInfoQuery, getAssistantsAutocompleteQuery, getAssistantsQuery, getCountAssistantsQuery, getEventEditionsQuery, getModulesQuery, getWorkshopsQuery, updateAttendancesQuery, updateAttendancesWorkshopsQuery } from "../helpers/assistantsQueries";
+import { getAssistantInfoQuery, getAssistantsAutocompleteQuery, getAssistantsQuery, getCountAssistantsQuery, updateAttendancesQuery, updateAttendancesWorkshopsQuery } from "../helpers/assistantsQueries";
 import { PropsGetAssistantsQueries, PropsGetTotalAssistantsQueries } from "../interfaces/IAssistants";
 
 export const getAssistants = async (req: any, res: Response) => {
@@ -66,48 +66,6 @@ export const getTotalAssistants = async (req: any, res: Response) => {
             msg: 'ok',
             data: queryTotalAssistants
         })
-    } catch (error) {
-        console.log(error);
-        res.status(500).json({
-            ok: false,
-            msg: 'Server error contact the administrator'
-        });
-    }
-}
-
-export const getEventEditions = async (req: any, res: Response) => {
-    try {
-        let eventEditions = await getEventEditionsQuery();
-
-        res.status(200).json(eventEditions)
-    } catch (error) {
-        console.log(error);
-        res.status(500).json({
-            ok: false,
-            msg: 'Server error contact the administrator'
-        });
-    }
-}
-
-export const getModules = async (req: any, res: Response) => {
-    try {
-        let modules = await getModulesQuery();
-
-        res.status(200).json(modules)
-    } catch (error) {
-        console.log(error);
-        res.status(500).json({
-            ok: false,
-            msg: 'Server error contact the administrator'
-        });
-    }
-}
-
-export const getWorkshops = async (req: any, res: Response) => {
-    try {
-        let workshops = await getWorkshopsQuery();
-        
-        res.status(200).json(workshops)
     } catch (error) {
         console.log(error);
         res.status(500).json({
