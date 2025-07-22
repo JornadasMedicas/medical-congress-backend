@@ -188,7 +188,9 @@ export const getWorkshopsQuery = async (): Promise<{ id: number, nombre: string 
             },
             select: {
                 id: true,
-                nombre: true
+                nombre: true,
+                created_at: true,
+                updated_at: true
             },
             orderBy: { id: 'asc' }
         });
@@ -251,6 +253,45 @@ export const createWorkshopQuery = ({ ...props }: PayloadWorkshops) => {
             resolve(res);
         } catch (error) {
             console.log(error);
+            reject(error);
+        }
+    })
+}
+
+export const editWorkshopQuery = ({ ...props }: { id: number, nombre: string }) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            let res = await db.jrn_talleres.update({
+                where: {
+                    id: props.id
+                },
+                data: {
+                    nombre: props.nombre,
+                    updated_at: moment.utc().subtract(6, 'hour').toISOString()
+                }
+            });
+
+            resolve(res);
+        } catch (error) {
+            reject(error);
+        }
+    })
+}
+
+export const deleteWorkshopQuery = (id: number) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            let res = await db.jrn_talleres.update({
+                where: {
+                    id
+                },
+                data: {
+                    deleted_at: moment.utc().subtract(6, 'hour').toISOString()
+                }
+            });
+
+            resolve(res);
+        } catch (error) {
             reject(error);
         }
     })

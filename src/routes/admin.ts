@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { createCategory, createEditon, createModule, createWorkshop, deleteCategory, deleteModule, editCategory, editModule, getCategories, getCountCatalogs, getEventEditions, getModules, getWorkshops } from "../controllers/admin";
+import { createCategory, createEditon, createModule, createWorkshop, deleteCategory, deleteModule, deleteWorkshop, editCategory, editModule, editWorkshop, getCategories, getCountCatalogs, getEventEditions, getModules, getWorkshops } from "../controllers/admin";
 
 const router: Router = Router();
 
@@ -15,8 +15,10 @@ router.post('/createWorkshop', createWorkshop);
 router.post('/createCategory', createCategory);
 
 router.put('/editModule', editModule);
+router.put('/editWorkshop', editWorkshop);
 router.put('/editCategory', editCategory);
 router.put('/deleteModule/:id', deleteModule);
 router.put('/deleteCategory/:id', deleteCategory);
+router.put('/deleteWorkshop/:id', deleteWorkshop);
 
 export default router;

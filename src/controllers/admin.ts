@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { createCategoryQuery, createEditionQuery, createModuleQuery, createWorkshopQuery, deleteCategoryQuery, deleteModuleQuery, editCategoryQuery, editModuleQuery, getCategoriesQuery, getCountCatalogsQuery, getEventEditionsQuery, getModulesQuery, getWorkshopsQuery } from "../helpers/adminQueries";
+import { createCategoryQuery, createEditionQuery, createModuleQuery, createWorkshopQuery, deleteCategoryQuery, deleteModuleQuery, deleteWorkshopQuery, editCategoryQuery, editModuleQuery, editWorkshopQuery, getCategoriesQuery, getCountCatalogsQuery, getEventEditionsQuery, getModulesQuery, getWorkshopsQuery } from "../helpers/adminQueries";
 
 export const getCountCatalogs = async (req: any, res: Response) => {
     try {
@@ -131,6 +131,34 @@ export const createWorkshop = async (req: any, res: Response) => {
                 msg: 'Server error contact the administrator'
             });
         }
+    }
+}
+
+export const editWorkshop = async (req: any, res: Response) => {
+    try {
+        let params = req.body;
+        let reg = await editWorkshopQuery(params);
+
+        res.status(200).json(reg);
+    } catch (error: any) {
+        res.status(500).json({
+            ok: false,
+            msg: 'Server error contact the administrator'
+        });
+    }
+}
+
+export const deleteWorkshop = async (req: any, res: Response) => {
+    try {        
+        let { id } = req.params;
+        let reg = await deleteWorkshopQuery(parseInt(id));
+
+        res.status(200).json(reg);
+    } catch (error: any) {
+        res.status(500).json({
+            ok: false,
+            msg: 'Server error contact the administrator'
+        });
     }
 }
 
