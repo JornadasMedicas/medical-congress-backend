@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { createEditionQuery, createModuleQuery, createWorkshopQuery, deleteModuleQuery, editModuleQuery, getCountCatalogsQuery, getEventEditionsQuery, getModulesQuery, getWorkshopsQuery } from "../helpers/adminQueries";
+import { createCategoryQuery, createEditionQuery, createModuleQuery, createWorkshopQuery, deleteCategoryQuery, deleteModuleQuery, editCategoryQuery, editModuleQuery, getCategoriesQuery, getCountCatalogsQuery, getEventEditionsQuery, getModulesQuery, getWorkshopsQuery } from "../helpers/adminQueries";
 
 export const getCountCatalogs = async (req: any, res: Response) => {
     try {
@@ -141,6 +141,69 @@ export const getEventEditions = async (req: any, res: Response) => {
         res.status(200).json(eventEditions)
     } catch (error) {
         console.log(error);
+        res.status(500).json({
+            ok: false,
+            msg: 'Server error contact the administrator'
+        });
+    }
+}
+
+export const getCategories = async (req: any, res: Response) => {
+    try {
+        let categories = await getCategoriesQuery();
+        
+        res.status(200).json(categories)
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            ok: false,
+            msg: 'Server error contact the administrator'
+        });
+    }
+}
+
+export const createCategory = async (req: any, res: Response) => {
+    try {
+        let { nombre } = req.body;
+        let reg = await createCategoryQuery(nombre);
+
+        res.status(200).json(reg);
+    } catch (error: any) {
+        if (error.code === 'P2002') {
+            res.status(409).json({
+                ok: false,
+                msg: `La categoria ${req.body.nombre} ya ha sido registrado`
+            });
+        } else {
+            res.status(500).json({
+                ok: false,
+                msg: 'Server error contact the administrator'
+            });
+        }
+    }
+}
+
+export const editCategory = async (req: any, res: Response) => {
+    try {
+        let params = req.body;
+        let reg = await editCategoryQuery(params);
+
+        res.status(200).json(reg);
+    } catch (error: any) {
+        res.status(500).json({
+            ok: false,
+            msg: 'Server error contact the administrator'
+        });
+    }
+}
+
+export const deleteCategory = async (req: any, res: Response) => {
+    try {        
+        let { id } = req.params;
+        let reg = await deleteCategoryQuery(parseInt(id));
+
+        res.status(200).json(reg);
+    } catch (error: any) {
         res.status(500).json({
             ok: false,
             msg: 'Server error contact the administrator'

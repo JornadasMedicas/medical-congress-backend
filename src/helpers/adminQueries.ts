@@ -42,15 +42,35 @@ export const getCountCatalogsQuery = () => {
     })
 }
 
+export const getEventEditionsQuery = async (): Promise<{ id: number, edicion: string }[]> => {
+    try {
+        let editions = await db.jrn_edicion.findMany({
+            where: {
+                deleted_at: null
+            },
+            select: {
+                id: true,
+                edicion: true
+            },
+            orderBy: { id: 'desc' }
+        });
+
+        return editions;
+    } catch (error) {
+        console.log('Error fetching event editions', error);
+        throw error;
+    }
+}
+
 export const createEditionQuery = ({ ...props }: { edicion: string, fec_inicial: string, fec_final: string }) => {
     return new Promise(async (resolve, reject) => {
         try {
             let res = await db.jrn_edicion.create({
                 data: {
                     edicion: props.edicion,
-                    fec_dia_1: moment(props.fec_inicial).toISOString(),
-                    fec_dia_2: moment(props.fec_inicial).add(1, 'day').toISOString(),
-                    fec_dia_3: moment(props.fec_final).toISOString()
+                    fec_dia_1: moment.utc(props.fec_inicial).toISOString(),
+                    fec_dia_2: moment.utc(props.fec_inicial).add(1, 'day').toISOString(),
+                    fec_dia_3: moment.utc(props.fec_final).toISOString()
                 }
             });
 
@@ -107,7 +127,9 @@ export const createModuleQuery = (nombre: string) => {
             } else {
                 res = await db.jrn_modulos.create({
                     data: {
-                        nombre
+                        nombre,
+                        created_at: moment.utc().subtract(6, 'hour').toISOString(),
+                        updated_at: moment.utc().subtract(6, 'hour').toISOString(),
                     }
                 });
             }
@@ -219,7 +241,9 @@ export const createWorkshopQuery = ({ ...props }: PayloadWorkshops) => {
                         hora_inicio: iso_ini,
                         hora_fin: iso_fin,
                         id_modulo: props.modulo,
-                        id_edicion: props.edicion
+                        id_edicion: props.edicion,
+                        created_at: moment.utc().subtract(6, 'hour').toISOString(),
+                        updated_at: moment.utc().subtract(6, 'hour').toISOString(),
                     }
                 });
             }
@@ -232,22 +256,101 @@ export const createWorkshopQuery = ({ ...props }: PayloadWorkshops) => {
     })
 }
 
-export const getEventEditionsQuery = async (): Promise<{ id: number, edicion: string }[]> => {
+export const getCategoriesQuery = async (): Promise<{ id: number, nombre: string }[]> => {
     try {
-        let editions = await db.jrn_edicion.findMany({
+        let categories = await db.jrn_categorias.findMany({
             where: {
                 deleted_at: null
             },
             select: {
                 id: true,
-                edicion: true
+                nombre: true,
+                created_at: true,
+                updated_at: true
             },
-            orderBy: { id: 'desc' }
+            orderBy: { id: 'asc' }
         });
 
-        return editions;
+        return categories;
     } catch (error) {
-        console.log('Error fetching event editions', error);
+        console.log('Error fetching modules', error);
         throw error;
     }
+}
+
+export const createCategoryQuery = (nombre: string) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            let res: any = {};
+            let duplicated = await db.jrn_categorias.findFirst({
+                where: {
+                    nombre,
+                    deleted_at: { not: null }
+                }
+            });
+
+            if (duplicated) {
+                res = await db.jrn_categorias.update({
+                    where: {
+                        id: duplicated.id
+                    },
+                    data: {
+                        updated_at: moment.utc().subtract(6, 'hour').toISOString(),
+                        deleted_at: null
+                    }
+                });
+            } else {
+                res = await db.jrn_categorias.create({
+                    data: {
+                        nombre,
+                        created_at: moment.utc().subtract(6, 'hour').toISOString(),
+                        updated_at: moment.utc().subtract(6, 'hour').toISOString(),
+                    }
+                });
+            }
+
+            resolve(res);
+        } catch (error) {
+            reject(error);
+        }
+    })
+}
+
+export const editCategoryQuery = ({ ...props }: { id: number, nombre: string }) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            let res = await db.jrn_categorias.update({
+                where: {
+                    id: props.id
+                },
+                data: {
+                    nombre: props.nombre,
+                    updated_at: moment.utc().subtract(6, 'hour').toISOString()
+                }
+            });
+
+            resolve(res);
+        } catch (error) {
+            reject(error);
+        }
+    })
+}
+
+export const deleteCategoryQuery = (id: number) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            let res = await db.jrn_categorias.update({
+                where: {
+                    id
+                },
+                data: {
+                    deleted_at: moment.utc().subtract(6, 'hour').toISOString()
+                }
+            });
+
+            resolve(res);
+        } catch (error) {
+            reject(error);
+        }
+    })
 }

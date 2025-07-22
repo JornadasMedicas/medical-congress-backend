@@ -1,16 +1,39 @@
-import moment from "moment-timezone";
-import { db } from "../utils/db";
-import { PropsGetAssistantsQueries, PropsGetTotalAssistantsQueries } from "../interfaces/IAssistants";
-
-moment.tz.setDefault('America/Mexico_City');
-
-export const getAssistantsQuery = ({ ...props }: PropsGetAssistantsQueries) => {
-    return new Promise(async (resolve, reject) => {
+"use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __rest = (this && this.__rest) || function (s, e) {
+    var t = {};
+    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
+        t[p] = s[p];
+    if (s != null && typeof Object.getOwnPropertySymbols === "function")
+        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
+            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
+                t[p[i]] = s[p[i]];
+        }
+    return t;
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.updateAttendancesWorkshopsQuery = exports.updateAttendancesQuery = exports.getCountAssistantsQuery = exports.getAssistantsAutocompleteQuery = exports.getAssistantInfoQuery = exports.getAssistantsQuery = void 0;
+const moment_timezone_1 = __importDefault(require("moment-timezone"));
+const db_1 = require("../utils/db");
+moment_timezone_1.default.tz.setDefault('America/Mexico_City');
+const getAssistantsQuery = (_a) => {
+    var props = __rest(_a, []);
+    return new Promise((resolve, reject) => __awaiter(void 0, void 0, void 0, function* () {
         try {
             const rowsPerPage = parseInt(props.limit);
             const min = ((parseInt(props.page) + 1) * rowsPerPage) - rowsPerPage;
-
-            let listAssistants = await db.jrn_persona.findMany({
+            let listAssistants = yield db_1.db.jrn_persona.findMany({
                 where: {
                     correo: props.email ? { contains: props.email } : {},
                     OR: [
@@ -54,18 +77,18 @@ export const getAssistantsQuery = ({ ...props }: PropsGetAssistantsQueries) => {
                 skip: min,
                 take: rowsPerPage
             });
-
             resolve(listAssistants);
-        } catch (error) {
+        }
+        catch (error) {
             reject(error);
         }
-    })
-}
-
-export const getAssistantInfoQuery = (email: string) => {
-    return new Promise(async (resolve, reject) => {
+    }));
+};
+exports.getAssistantsQuery = getAssistantsQuery;
+const getAssistantInfoQuery = (email) => {
+    return new Promise((resolve, reject) => __awaiter(void 0, void 0, void 0, function* () {
         try {
-            let assistant = await db.jrn_persona.findFirst({
+            let assistant = yield db_1.db.jrn_persona.findFirst({
                 where: {
                     correo: email ? { contains: email } : {}
                 },
@@ -99,18 +122,18 @@ export const getAssistantInfoQuery = (email: string) => {
                     }
                 }
             });
-
             resolve(assistant);
-        } catch (error) {
+        }
+        catch (error) {
             reject(error);
         }
-    })
-}
-
-export const getAssistantsAutocompleteQuery = (params: { filter: string }) => {
-    return new Promise(async (resolve, reject) => {
+    }));
+};
+exports.getAssistantInfoQuery = getAssistantInfoQuery;
+const getAssistantsAutocompleteQuery = (params) => {
+    return new Promise((resolve, reject) => __awaiter(void 0, void 0, void 0, function* () {
         try {
-            let listAssistants = await db.jrn_persona.findMany({
+            let listAssistants = yield db_1.db.jrn_persona.findMany({
                 where: {
                     OR: [
                         { nombre: params.filter ? { contains: params.filter } : {} },
@@ -127,18 +150,19 @@ export const getAssistantsAutocompleteQuery = (params: { filter: string }) => {
                 },
                 take: 10
             });
-
             resolve(listAssistants);
-        } catch (error) {
+        }
+        catch (error) {
             reject(error);
         }
-    })
-}
-
-export const getCountAssistantsQuery = ({ ...props }: PropsGetTotalAssistantsQueries) => {
-    return new Promise(async (resolve, reject) => {
+    }));
+};
+exports.getAssistantsAutocompleteQuery = getAssistantsAutocompleteQuery;
+const getCountAssistantsQuery = (_a) => {
+    var props = __rest(_a, []);
+    return new Promise((resolve, reject) => __awaiter(void 0, void 0, void 0, function* () {
         try {
-            let countListAssistants = await db.jrn_persona.count({
+            let countListAssistants = yield db_1.db.jrn_persona.count({
                 where: {
                     correo: props.email ? { contains: props.email } : {},
                     OR: [
@@ -169,21 +193,17 @@ export const getCountAssistantsQuery = ({ ...props }: PropsGetTotalAssistantsQue
                     ]
                 },
             });
-
-            countListAssistants ? (
-
-                resolve(countListAssistants)
-
-            ) : resolve(0);
-        } catch (error) {
+            countListAssistants ? (resolve(countListAssistants)) : resolve(0);
+        }
+        catch (error) {
             console.log(error);
             reject(error);
         }
-    })
-}
-
-export const updateAttendancesQuery = (assistant: { assistant: string }) => {
-    return new Promise(async (resolve, reject) => {
+    }));
+};
+exports.getCountAssistantsQuery = getCountAssistantsQuery;
+const updateAttendancesQuery = (assistant) => {
+    return new Promise((resolve, reject) => __awaiter(void 0, void 0, void 0, function* () {
         try {
             /* const dnow = moment(`${moment().format('YYYY')}-${moment().format('MM')}-${moment().format('DD')}`);
             const registerDay1 = moment(`${moment().format('YYYY')}-11-20`);
@@ -252,17 +272,17 @@ export const updateAttendancesQuery = (assistant: { assistant: string }) => {
             } else {
                 resolve({ ok: false, typeError: 1 });
             } */
-
             resolve(true);
-        } catch (error) {
+        }
+        catch (error) {
             reject(error);
         }
-    })
-}
-
+    }));
+};
+exports.updateAttendancesQuery = updateAttendancesQuery;
 //!IMPORTANT UPDATE EVERY YEAR
-export const updateAttendancesWorkshopsQuery = (assistant: { assistant: string }) => {
-    return new Promise(async (resolve, reject) => {
+const updateAttendancesWorkshopsQuery = (assistant) => {
+    return new Promise((resolve, reject) => __awaiter(void 0, void 0, void 0, function* () {
         try {
             /* const dateT1 = moment(`${moment().format('YYYY')}-11-22 08:00:00`);
             const dateT2 = moment(`${moment().format('YYYY')}-11-22 15:30:00`);
@@ -315,10 +335,11 @@ export const updateAttendancesWorkshopsQuery = (assistant: { assistant: string }
             } else {
                 resolve({ ok: false, typeError: 1 });
             } */
-
-            resolve(true)
-        } catch (error) {
+            resolve(true);
+        }
+        catch (error) {
             reject(error);
         }
-    })
-}
+    }));
+};
+exports.updateAttendancesWorkshopsQuery = updateAttendancesWorkshopsQuery;

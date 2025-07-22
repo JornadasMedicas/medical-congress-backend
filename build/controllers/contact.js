@@ -21,7 +21,7 @@ const sendContactMail = (req, res) => __awaiter(void 0, void 0, void 0, function
             name: "cae",
             host: "smtp.gmail.com",
             port: 587,
-            secure: false,
+            secure: false, // Use `true` for port 465, `false` for all other ports
             auth: {
                 user: `${process.env.EMAIL_CONTACTO}`,
                 pass: `${process.env.EMAIL_CONTACTO_PASSWORD}`
@@ -31,9 +31,9 @@ const sendContactMail = (req, res) => __awaiter(void 0, void 0, void 0, function
             }
         });
         const info = yield transporter.sendMail({
-            from: `"Centro de Alta Especialidad Dr. Rafael Lucio" <${process.env.EMAIL_CONTACTO}>`,
-            to: `${process.env.EMAIL_CONTACTO}`,
-            subject: 'SOLICITUD: ' + data.asunto,
+            from: `"Centro de Alta Especialidad Dr. Rafael Lucio" <${process.env.EMAIL_CONTACTO}>`, // sender address
+            to: `${process.env.EMAIL_CONTACTO}`, // main receiver
+            subject: 'SOLICITUD: ' + data.asunto, // Subject line
             text: `
             Solicitante: ${data.nombre}\n
             Teléfono: ${data.telefono}\n
