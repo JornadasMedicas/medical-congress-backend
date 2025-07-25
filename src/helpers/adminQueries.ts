@@ -189,8 +189,21 @@ export const getWorkshopsQuery = async (): Promise<{ id: number, nombre: string 
             select: {
                 id: true,
                 nombre: true,
+                fecha: true,
                 created_at: true,
-                updated_at: true
+                updated_at: true,
+                jrn_modulo: {
+                    select: {
+                        id: true,
+                        nombre: true
+                    }
+                },
+                jrn_edicion: {
+                    select: {
+                        id: true,
+                        edicion: true
+                    }
+                },
             },
             orderBy: { id: 'asc' }
         });
