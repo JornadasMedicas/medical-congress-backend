@@ -80,9 +80,9 @@ if __name__ == "__main__":
 
     for data in res:
         print(
-            f"INSERT INTO jrn_persona(acronimo,nombre,categoria,correo,rfc,tel,ciudad,dependencia,qr_enviado, email_registro, email_constancia) VALUES('{data[1]}', '{data[2]}', '{data[3]}', '{data[4]}', {noneFormat(data[5])}, '{data[6]}', '{data[7]}', {noneFormat(data[8])}, false, NULL, NULL)")
+            f"INSERT INTO jrn_persona(acronimo,nombre,categoria,correo,rfc,tel,ciudad,dependencia,qr_enviado, email_registro, email_constancia, created_at, updated_at) VALUES('{data[1]}', '{data[2]}', '{data[3]}', '{data[4]}', {noneFormat(data[5])}, '{data[6]}', '{data[7]}', {noneFormat(data[8])}, false, NULL, NULL, '{data[9]}', '{data[10]}')")
         cursor2.execute(
-            f"INSERT INTO jrn_persona(acronimo,nombre,categoria,correo,rfc,tel,ciudad,dependencia,qr_enviado, email_registro, email_constancia) VALUES('{data[1]}', '{data[2]}', '{data[3]}', '{data[4]}', {noneFormat(data[5])}, '{data[6]}', '{data[7]}', {noneFormat(data[8])}, false, NULL, NULL)")
+            f"INSERT INTO jrn_persona(acronimo,nombre,categoria,correo,rfc,tel,ciudad,dependencia,qr_enviado, email_registro, email_constancia, created_at, updated_at) VALUES('{data[1]}', '{data[2]}', '{data[3]}', '{data[4]}', {noneFormat(data[5])}, '{data[6]}', '{data[7]}', {noneFormat(data[8])}, false, NULL, NULL, '{data[9]}', '{data[10]}')")
 
     # -------MIGRACION jrn_evento > jrn_inscritos_taller-------
     cursor.execute("SELECT `isRegisteredT1`, `isRegisteredT2`, id_persona FROM jrn_evento WHERE `isRegisteredT1` = 1 OR `isRegisteredT2` = 1;")
