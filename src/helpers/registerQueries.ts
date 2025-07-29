@@ -2,7 +2,7 @@ import moment from "moment";
 import { db } from "../utils/db";
 import { PropsSendRegistMailInterface } from "../interfaces/IRegister";
 
-export const createInsertionQuery = ({ ...props }: PropsSendRegistMailInterface) => {
+export const createInsertionQuery = ({ ...props }: PropsSendRegistMailInterface, email: any) => {
     return new Promise(async (resolve, reject) => {
         try {
             const repeated: any = await db.jrn_persona.findFirst({
@@ -26,6 +26,9 @@ export const createInsertionQuery = ({ ...props }: PropsSendRegistMailInterface)
                         dependencia: props.dependencia === '' ? null : props.dependencia,
                         created_at: moment.utc().subtract(6, 'hour').toISOString(), //gmt -6
                         updated_at: moment.utc().subtract(6, 'hour').toISOString(),
+                        qr_enviado: true,
+                        qr_enviado_at: moment.utc().subtract(6, 'hour').toISOString(),
+                        email_registro: email.user,
                         jrn_inscritos_modulos: {
                             create: {
                                 asistioDia1: false,

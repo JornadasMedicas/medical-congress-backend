@@ -5,6 +5,7 @@ import path from 'path';
 import { generateQr } from "../helpers/canvasQrGenerate";
 import { createInsertionQuery, getEmailUsed } from "../helpers/registerQueries";
 import { infoEmails } from "../helpers/emailsData";
+import moment from "moment";
 
 export const sendRegistMail = async (req: any, res: any) => {
     try {
@@ -17,10 +18,10 @@ export const sendRegistMail = async (req: any, res: any) => {
                 msg: 'El limite de registros diarios se ha alcanzado. Intente de nuevo mañana.'
             });
         } else {
-            const response: any = await createInsertionQuery(data);
             const email = infoEmails.filter((item: any) => {
                 return item.email === emailNumber;
             });
+            const response: any = await createInsertionQuery(data, email);
 
             if (Object.keys(response).length === 0) { //if email is already registered
                 res.status(409).json({
@@ -52,8 +53,8 @@ export const sendRegistMail = async (req: any, res: any) => {
                 const info: SMTPTransport.SentMessageInfo = await transporter.sendMail({
                     from: `"Centro de Alta Especialidad Dr. Rafael Lucio" <${email[0].user}>`, // sender address
                     to: `${data.correo.trim()}`, // main receiver
-                    subject: 'JORNADAS MÉDICAS 2024', // Subject line
-                    text: `Estimado ${data.acronimo + ' ' + data.nombre + ' ' + data.apellidos}, el Centro de Alta Especialidad Dr. Rafael Lucio agradece su participación en las Jornadas Médicas 2024.\nA continuación se muestra adjunto su código QR el cuál deberá descargar y presentar antes de ingresar al evento para registrar su asistencia.
+                    subject: `JORNADAS MÉDICAS ${moment.utc().format('YYYY')}`, // Subject line
+                    text: `Estimado ${data.acronimo + ' ' + data.nombre + ' ' + data.apellidos}, el Centro de Alta Especialidad Dr. Rafael Lucio agradece su participación en las Jornadas Médicas ${moment.utc().format('YYYY')}.\nA continuación se muestra adjunto su código QR el cuál deberá descargar y presentar antes de ingresar al evento para registrar su asistencia.
                     `,
                     attachments: [
                         {
