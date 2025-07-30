@@ -13,32 +13,32 @@ export const getAssistantsQuery = ({ ...props }: PropsGetAssistantsQueries) => {
             let listAssistants = await db.jrn_persona.findMany({
                 where: {
                     correo: props.email ? { contains: props.email } : {},
-                    OR: [
-                        {
-                            jrn_inscritos_modulos: {
-                                some: {
-                                    jrn_modulo: {
-                                        nombre: props.module === '' && props.workshop === '' ? {} : props.module,
-                                    },
-                                    jrn_edicion: {
-                                        edicion: props.year
-                                    }
-                                }
-                            },
-                        },
-                        {
-                            jrn_inscritos_talleres: {
-                                some: {
-                                    jrn_taller: {
-                                        id: props.workshop ? parseInt(props.workshop) : 0,
-                                        jrn_edicion: {
-                                            edicion: props.year
+                    created_at: {
+                        gte: moment.utc(props.year).toISOString(),
+                        lt: moment.utc(props.year).add(1, 'year').toISOString()
+                    },
+                    ...((props.module !== '' || props.workshop !== '') && {
+                        OR: [
+                            {
+                                jrn_inscritos_modulos: {
+                                    some: {
+                                        jrn_modulo: {
+                                            nombre: props.module,
                                         }
-                                    },
-                                }
+                                    }
+                                },
                             },
-                        }
-                    ]
+                            {
+                                jrn_inscritos_talleres: {
+                                    some: {
+                                        jrn_taller: {
+                                            id: props.workshop ? parseInt(props.workshop) : 0
+                                        },
+                                    }
+                                },
+                            }
+                        ]
+                    }),
                 },
                 select: {
                     id: true,
@@ -107,11 +107,15 @@ export const getAssistantInfoQuery = (email: string) => {
     })
 }
 
-export const getAssistantsAutocompleteQuery = (params: { filter: string }) => {
+export const getAssistantsAutocompleteQuery = (params: { filter: string, edicion: string }) => {
     return new Promise(async (resolve, reject) => {
         try {
             let listAssistants = await db.jrn_persona.findMany({
                 where: {
+                    created_at: {
+                        gte: moment.utc(params.edicion).toISOString(),
+                        lt: moment.utc(params.edicion).add(1, 'year').toISOString()
+                    },
                     OR: [
                         { nombre: params.filter ? { contains: params.filter } : {} },
                         { correo: params.filter ? { contains: params.filter } : {} }
@@ -141,32 +145,32 @@ export const getCountAssistantsQuery = ({ ...props }: PropsGetTotalAssistantsQue
             let countListAssistants = await db.jrn_persona.count({
                 where: {
                     correo: props.email ? { contains: props.email } : {},
-                    OR: [
-                        {
-                            jrn_inscritos_modulos: {
-                                some: {
-                                    jrn_modulo: {
-                                        nombre: props.module === '' && props.workshop === '' ? {} : props.module,
-                                    },
-                                    jrn_edicion: {
-                                        edicion: props.year
-                                    }
-                                }
-                            },
-                        },
-                        {
-                            jrn_inscritos_talleres: {
-                                some: {
-                                    jrn_taller: {
-                                        id: props.workshop ? parseInt(props.workshop) : 0,
-                                        jrn_edicion: {
-                                            edicion: props.year
+                    created_at: {
+                        gte: moment.utc(props.year).toISOString(),
+                        lt: moment.utc(props.year).add(1, 'year').toISOString()
+                    },
+                    ...((props.module !== '' || props.workshop !== '') && {
+                        OR: [
+                            {
+                                jrn_inscritos_modulos: {
+                                    some: {
+                                        jrn_modulo: {
+                                            nombre: props.module,
                                         }
-                                    },
-                                }
+                                    }
+                                },
                             },
-                        }
-                    ]
+                            {
+                                jrn_inscritos_talleres: {
+                                    some: {
+                                        jrn_taller: {
+                                            id: props.workshop ? parseInt(props.workshop) : 0
+                                        },
+                                    }
+                                },
+                            }
+                        ]
+                    }),
                 },
             });
 

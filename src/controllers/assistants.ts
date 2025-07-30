@@ -40,7 +40,7 @@ export const getAssistantInfo = async (req: any, res: Response) => {
 
 export const getAssistantsAutocomplete = async (req: any, res: Response) => {
     try {
-        const params: { filter: string } = req.query;
+        const params: { filter: string, edicion: string } = req.query;
         let queryAssistants = await getAssistantsAutocompleteQuery(params);
         res.status(200).json({
             ok: true,

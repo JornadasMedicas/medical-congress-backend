@@ -35,7 +35,7 @@ export const createInsertionQuery = ({ ...props }: PropsSendRegistMailInterface,
                         qr_enviado: true,
                         qr_enviado_at: moment.utc().subtract(6, 'hour').toISOString(),
                         email_registro: email[0].user,
-                        ...(props.modulo !== 0 && {
+                        ...((props.modulo !== 0 && props.modulo !== null)  && {
                             jrn_inscritos_modulos: {
                                 create: {
                                     asistioDia1: false,
