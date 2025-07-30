@@ -5,9 +5,15 @@ import { PropsSendRegistMailInterface } from "../interfaces/IRegister";
 export const createInsertionQuery = ({ ...props }: PropsSendRegistMailInterface, email: any) => {
     return new Promise(async (resolve, reject) => {
         try {
+            const currentYear: string = moment.utc().format('YYYY');
+
             const repeated: any = await db.jrn_persona.findFirst({
                 where: {
-                    correo: props.correo
+                    correo: props.correo,
+                    created_at: {
+                        gte: moment.utc(currentYear).toISOString(),
+                        lt: moment.utc(currentYear).add(1, 'year').toISOString()
+                    }
                 }
             });
 
@@ -28,22 +34,26 @@ export const createInsertionQuery = ({ ...props }: PropsSendRegistMailInterface,
                         updated_at: moment.utc().subtract(6, 'hour').toISOString(),
                         qr_enviado: true,
                         qr_enviado_at: moment.utc().subtract(6, 'hour').toISOString(),
-                        email_registro: email.user,
-                        jrn_inscritos_modulos: {
-                            create: {
-                                asistioDia1: false,
-                                asistioDia2: false,
-                                asistioDia3: false,
-                                constancia_enviada: false,
-                                id_edicion: props.id_edicion,
-                                id_modulo: props.id_modulo
+                        email_registro: email[0].user,
+                        ...(props.modulo !== 0 && {
+                            jrn_inscritos_modulos: {
+                                create: {
+                                    asistioDia1: false,
+                                    asistioDia2: false,
+                                    asistioDia3: false,
+                                    constancia_enviada: false,
+                                    id_edicion: props.edicion,
+                                    id_modulo: props.modulo
+                                }
+                            },
+                        }),
+                        ...(props.talleres.length > 0 && {
+                            jrn_inscritos_talleres: {
+                                createMany: {
+                                    data: props.talleres
+                                }
                             }
-                        },
-                        jrn_inscritos_talleres: {
-                            createMany: {
-                                data: props.talleres
-                            }
-                        }
+                        })
                     }
                 });
 

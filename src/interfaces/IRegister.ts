@@ -19,7 +19,7 @@ export interface PropsSendRegistMailInterface {
     tel: string;
     ciudad: string;
     dependencia?: string;
-    id_edicion: number;
-    id_modulo: number;
+    edicion: number;
+    modulo: number;
     talleres: PropsTalleresInterface[];
 }

@@ -21,6 +21,35 @@ export const sendRegistMail = async (req: any, res: any) => {
             const email = infoEmails.filter((item: any) => {
                 return item.email === emailNumber;
             });
+
+            const transporter = nodemailer.createTransport({
+                name: "cae",
+                host: "smtp.gmail.com",
+                port: 587,
+                secure: false, // Use `true` for port 465, `false` for all other ports
+                auth: {
+                    user: email[0].user,
+                    pass: email[0].password
+                },
+                tls: {
+                    rejectUnauthorized: false
+                }
+            });
+
+            //verficamos la conexion al servidor antes de hacer inserciones en la DB
+            const smtpOk = await transporter.verify().catch((err) => {
+                console.error("Error de conexión SMTP:", err);
+                return false;
+            });
+
+            if (!smtpOk) {
+                return res.status(503).json({
+                    ok: false,
+                    msg: 'No se pudo establecer conexión con el servidor de correo. Intente más tarde.'
+                });
+            }
+            
+            //si la conexión con el servidor es exitosa podemos hacer inserciones en la DB
             const response: any = await createInsertionQuery(data, email);
 
             if (Object.keys(response).length === 0) { //if email is already registered
@@ -36,19 +65,6 @@ export const sendRegistMail = async (req: any, res: any) => {
             } else { //if all transactions were successfully done
                 const rutaLogo: string = path.join(__dirname, `../../public/cae_logo.png`);
                 const rutaQr: string = await generateQr(data, rutaLogo); //generate and save qr code on public folder
-                const transporter = nodemailer.createTransport({
-                    name: "cae",
-                    host: "smtp.gmail.com",
-                    port: 587,
-                    secure: false, // Use `true` for port 465, `false` for all other ports
-                    auth: {
-                        user: email[0].user,
-                        pass: email[0].password
-                    },
-                    tls: {
-                        rejectUnauthorized: false
-                    }
-                });
 
                 const info: SMTPTransport.SentMessageInfo = await transporter.sendMail({
                     from: `"Centro de Alta Especialidad Dr. Rafael Lucio" <${email[0].user}>`, // sender address
