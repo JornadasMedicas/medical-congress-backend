@@ -1,6 +1,7 @@
 import moment from "moment";
 import { db } from "../utils/db";
 import { PropsSendRegistMailInterface } from "../interfaces/IRegister";
+import axios from "axios";
 
 export const createInsertionQuery = ({ ...props }: PropsSendRegistMailInterface, email: any) => {
     return new Promise(async (resolve, reject) => {
@@ -35,7 +36,7 @@ export const createInsertionQuery = ({ ...props }: PropsSendRegistMailInterface,
                         qr_enviado: true,
                         qr_enviado_at: moment.utc().subtract(6, 'hour').toISOString(),
                         email_registro: email[0].user,
-                        ...((props.modulo !== 0 && props.modulo !== null)  && {
+                        ...((props.modulo !== 0 && props.modulo !== null) && {
                             jrn_inscritos_modulos: {
                                 create: {
                                     asistioDia1: false,
@@ -126,4 +127,24 @@ export const getEmailUsed = (): Promise<number> => {
             reject(error);
         }
     })
+}
+
+export const validateRecaptcha = async (token: string) => {
+    try {
+        const res = await axios.post('https://www.google.com/recaptcha/api/siteverify', null, {
+            params: {
+                secret: process.env.VITE_APP_SECRET_KEY,
+                response: token
+            }
+        });
+
+        if (res.data.success && res.data.score > 0.5) {
+            return true;
+        } else {
+            return false;
+        }
+    } catch (error) {
+        console.log(error);
+        return false;
+    }
 }

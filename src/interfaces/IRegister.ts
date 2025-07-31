@@ -22,4 +22,5 @@ export interface PropsSendRegistMailInterface {
     edicion: number;
     modulo: number;
     talleres: PropsTalleresInterface[];
+    recaptchaToken: string;
 }

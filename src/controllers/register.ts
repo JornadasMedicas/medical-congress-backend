@@ -3,7 +3,7 @@ import SMTPTransport from "nodemailer/lib/smtp-transport";
 import { PropsSendRegistMailInterface } from "../interfaces/IRegister";
 import path from 'path';
 import { generateQr } from "../helpers/canvasQrGenerate";
-import { createInsertionQuery, getEmailUsed } from "../helpers/registerQueries";
+import { createInsertionQuery, getEmailUsed, validateRecaptcha } from "../helpers/registerQueries";
 import { infoEmails } from "../helpers/emailsData";
 import moment from "moment";
 
@@ -48,17 +48,21 @@ export const sendRegistMail = async (req: any, res: any) => {
                     msg: 'No se pudo establecer conexión con el servidor de correo. Intente más tarde.'
                 });
             }
-            
+
+            const isValidHuman = await validateRecaptcha(data.recaptchaToken);
+
+            if (!isValidHuman) {
+                res.status(403).json({
+                    ok: false,
+                    msg: 'ok',
+                    data: 'Se ha detectado actividad inusual al enviar el formulario. Porfavor intente de nuevo.'
+                });
+            }
+
             //si la conexión con el servidor es exitosa podemos hacer inserciones en la DB
             const response: any = await createInsertionQuery(data, email);
 
-            res.status(200).json({
-                ok: true,
-                msg: 'ok',
-                data: 'ok'
-            });
-
-            /* if (Object.keys(response).length === 0) { //if email is already registered
+            if (Object.keys(response).length === 0) { //if email is already registered
                 res.status(409).json({
                     ok: false,
                     msg: 'El correo ya ha sido registrado. Intente con uno nuevo. (409)'
@@ -91,7 +95,7 @@ export const sendRegistMail = async (req: any, res: any) => {
                     msg: 'ok',
                     data: info.response
                 });
-            } */
+            }
         }
     } catch (error) {
         console.log(error);
