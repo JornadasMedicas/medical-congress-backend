@@ -54,6 +54,7 @@ model jrn_edicion {
 model jrn_modulos {
     id         Int       @id @unique @default(autoincrement()) @db.UnsignedInt
     nombre     String    @unique @db.VarChar(50)
+    cupos      Int       @default(0) @db.SmallInt()
     created_at DateTime? @default(now()) @db.Timestamp(0)
     updated_at DateTime? @default(now()) @db.Timestamp(0)
     deleted_at DateTime? @db.Timestamp(0)
@@ -68,6 +69,7 @@ model jrn_talleres {
     fecha       DateTime  @db.Date
     hora_inicio DateTime  @db.Time()
     hora_fin    DateTime  @db.Time()
+    cupos       Int       @db.SmallInt()
     id_modulo   Int       @db.UnsignedInt
     id_edicion  Int       @db.UnsignedInt
     created_at  DateTime? @default(now()) @db.Timestamp(0)

@@ -71,8 +71,8 @@ if __name__ == "__main__":
         cursor2.execute(f"INSERT INTO jrn_modulos(nombre, created_at, updated_at) VALUES('{modulo}', now(), now())")
 
     # -------DATOS jrn_talleres-------
-    cursor2.execute(f"INSERT INTO jrn_talleres(nombre, fecha, hora_inicio, hora_fin, id_modulo, id_edicion, created_at, updated_at) VALUES('ESTRATEGIAS INTEGRADAS', '2024-11-22', '08:30:00', '12:30:00', 3, 1, now(), now())")
-    cursor2.execute(f"INSERT INTO jrn_talleres(nombre, fecha, hora_inicio, hora_fin, id_modulo, id_edicion, created_at, updated_at) VALUES('USO DE ROTEM', '2024-11-22', '16:00:00', '19:00:00', 1, 1, now(), now())")
+    cursor2.execute(f"INSERT INTO jrn_talleres(nombre, fecha, hora_inicio, hora_fin, cupos, id_modulo, id_edicion, created_at, updated_at) VALUES('ESTRATEGIAS INTEGRADAS', '2024-11-22', '08:30:00', '12:30:00', 0, 3, 1, now(), now())")
+    cursor2.execute(f"INSERT INTO jrn_talleres(nombre, fecha, hora_inicio, hora_fin, cupos, id_modulo, id_edicion, created_at, updated_at) VALUES('USO DE ROTEM', '2024-11-22', '16:00:00', '19:00:00', 0, 1, 1, now(), now())")
 
     # -------MIGRACION jrn_persona-------
     cursor.execute("SELECT * FROM jrn_persona")
