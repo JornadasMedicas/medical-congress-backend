@@ -142,7 +142,7 @@ export const createModuleQuery = (nombre: string) => {
     })
 }
 
-export const editModuleQuery = ({ ...props }: { id: number, nombre: string }) => {
+export const editModuleQuery = ({ ...props }: { id: number, nombre: string, cupos: number }) => {
     return new Promise(async (resolve, reject) => {
         try {
             let res = await db.jrn_modulos.update({
@@ -151,6 +151,7 @@ export const editModuleQuery = ({ ...props }: { id: number, nombre: string }) =>
                 },
                 data: {
                     nombre: props.nombre,
+                    cupos: props.cupos,
                     updated_at: moment.utc().subtract(6, 'hour').toISOString()
                 }
             });
@@ -274,7 +275,7 @@ export const createWorkshopQuery = ({ ...props }: PayloadWorkshops) => {
     })
 }
 
-export const editWorkshopQuery = ({ ...props }: { id: number, nombre: string }) => {
+export const editWorkshopQuery = ({ ...props }: { id: number, nombre: string, cupos: number }) => {
     return new Promise(async (resolve, reject) => {
         try {
             let res = await db.jrn_talleres.update({
@@ -283,6 +284,7 @@ export const editWorkshopQuery = ({ ...props }: { id: number, nombre: string }) 
                 },
                 data: {
                     nombre: props.nombre,
+                    cupos: props.cupos,
                     updated_at: moment.utc().subtract(6, 'hour').toISOString()
                 }
             });
