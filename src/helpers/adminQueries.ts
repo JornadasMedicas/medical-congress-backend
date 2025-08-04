@@ -90,6 +90,7 @@ export const getModulesQuery = async (): Promise<{ id: number, nombre: string }[
             select: {
                 id: true,
                 nombre: true,
+                cupos: true,
                 created_at: true,
                 updated_at: true
             },
@@ -190,6 +191,7 @@ export const getWorkshopsQuery = async (): Promise<{ id: number, nombre: string 
                 id: true,
                 nombre: true,
                 fecha: true,
+                cupos: true,
                 created_at: true,
                 updated_at: true,
                 jrn_modulo: {
@@ -255,6 +257,7 @@ export const createWorkshopQuery = ({ ...props }: PayloadWorkshops) => {
                         fecha: moment(props.fecha).toISOString(),
                         hora_inicio: iso_ini,
                         hora_fin: iso_fin,
+                        cupos: props.cupos,
                         id_modulo: props.modulo,
                         id_edicion: props.edicion,
                         created_at: moment.utc().subtract(6, 'hour').toISOString(),
