@@ -163,6 +163,26 @@ export const editModuleQuery = ({ ...props }: { id: number, nombre: string, cupo
     })
 }
 
+export const updateModuleCounter = ({ ...props }: { id: number, cupos: number }) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            let res = await db.jrn_modulos.update({
+                where: {
+                    id: props.id
+                },
+                data: {
+                    cupos: props.cupos,
+                    updated_at: moment.utc().subtract(6, 'hour').toISOString()
+                }
+            });
+
+            resolve(res);
+        } catch (error) {
+            reject(error);
+        }
+    })
+}
+
 export const deleteModuleQuery = (id: number) => {
     return new Promise(async (resolve, reject) => {
         try {

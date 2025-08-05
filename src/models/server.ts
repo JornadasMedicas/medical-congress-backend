@@ -8,11 +8,15 @@ import routeRegist from '../routes/register';
 import routeAssistants from '../routes/assistants';
 import routeAdmin from '../routes/admin';
 import fs from 'fs';
+import { Socket } from 'socket.io';
+import Sockets from './sockets';
 
 class Server {
     private app: Express;
     private port: number;
     private server: HttpServer;
+    private io: Socket;
+    private sockets: Sockets;
 
     constructor() {
 
@@ -29,6 +33,16 @@ class Server {
                 }, this.app
             )
             : require('http').createServer(this.app);
+        
+        //initialize sockets
+        this.io = require('socket.io')(this.server, {
+            cors: { //only enable cors if clients will connect from remote domains or ports besides 'origin'
+                origin: '*',
+                methods: ['GET', 'POST']
+            }
+        });
+        
+        this.sockets = new Sockets(this.io);
     }
 
     middlewares() {
