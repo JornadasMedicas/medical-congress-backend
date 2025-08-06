@@ -59,8 +59,8 @@ export const sendRegistMail = async (req: any, res: any) => {
                 });
             }
 
-            //si la conexión con el servidor es exitosa podemos hacer inserciones en la DB
-            const response: any = await createInsertionQuery(data, email);
+            /* //si la conexión con el servidor es exitosa podemos hacer inserciones en la DB
+            const response: any = await createInsertionQuery(data, email); */
 
             res.status(200).json({
                 ok: true,

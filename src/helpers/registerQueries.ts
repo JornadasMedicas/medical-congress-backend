@@ -1,6 +1,6 @@
 import moment from "moment";
 import { db } from "../utils/db";
-import { PropsSendRegistMailInterface } from "../interfaces/IRegister";
+import { PropsSendRegistMailInterface, PropsTalleresInterface } from "../interfaces/IRegister";
 import axios from "axios";
 
 export const createInsertionQuery = ({ ...props }: PropsSendRegistMailInterface, email: any) => {
@@ -147,4 +147,80 @@ export const validateRecaptcha = async (token: string) => {
         console.log(error);
         return false;
     }
+}
+
+export const updateModuleCounter = (id: number) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const res = await db.jrn_modulos.update({
+                where: {
+                    id
+                },
+                data: {
+                    cupos: {
+                        decrement: 1
+                    }
+                },
+                select: {
+                    id: true,
+                    nombre: true,
+                    cupos: true,
+                    created_at: true,
+                    updated_at: true
+                }
+            });
+
+            resolve(res);
+        } catch (error) {
+            reject(error);
+        }
+    })
+}
+
+export const updateWorkshopsCounter = (data: PropsTalleresInterface[]) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+
+            const res = await Promise.all(
+                data.map((workshop: PropsTalleresInterface) => {
+                    return (
+                        db.jrn_talleres.update({
+                            where: {
+                                id: workshop.id_taller
+                            },
+                            data: {
+                                cupos: {
+                                    decrement: 1
+                                }
+                            },
+                            select: {
+                                id: true,
+                                nombre: true,
+                                fecha: true,
+                                cupos: true,
+                                created_at: true,
+                                updated_at: true,
+                                jrn_modulo: {
+                                    select: {
+                                        id: true,
+                                        nombre: true
+                                    }
+                                },
+                                jrn_edicion: {
+                                    select: {
+                                        id: true,
+                                        edicion: true
+                                    }
+                                },
+                            }
+                        })
+                    )
+                })
+            );
+
+            resolve(res);
+        } catch (error) {
+            reject(error);
+        }
+    })
 }
