@@ -21,11 +21,19 @@ class Sockets {
                 let workshops: any[] = [];
 
                 if (data.modulo !== null && data.modulo !== 0) {
-                    modules = await updateModuleCounter(data.modulo) as any[];
+                    const resModules = await updateModuleCounter(data.modulo) as any[];
+
+                    if (resModules) {
+                        modules = await getModulesQuery();
+                    }
                 }
 
                 if (data.talleres.length > 0) {
-                    workshops = await updateWorkshopsCounter(data.talleres) as any[];
+                    const resWorkshops = await updateWorkshopsCounter(data.talleres) as any[];
+
+                    if (resWorkshops) {
+                        workshops = await getWorkshopsQuery();
+                    }
                 }
 
                 this.io.emit('updateCounters', { modules, workshops });

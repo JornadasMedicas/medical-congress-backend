@@ -202,7 +202,7 @@ export const deleteModuleQuery = (id: number) => {
     })
 }
 
-export const getWorkshopsQuery = async (): Promise<{ id: number, nombre: string }[]> => {
+export const getWorkshopsQuery = async (): Promise<any[]> => {
     try {
         let workshops = await db.jrn_talleres.findMany({
             where: {
