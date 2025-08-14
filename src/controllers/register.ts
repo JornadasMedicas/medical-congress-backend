@@ -49,6 +49,7 @@ export const sendRegistMail = async (req: any, res: any) => {
                 });
             }
 
+            //verificamos el puntaje del captcha para evitar entradas por bots
             const isValidHuman = await validateRecaptcha(data.recaptchaToken);
 
             if (!isValidHuman) {
@@ -59,16 +60,10 @@ export const sendRegistMail = async (req: any, res: any) => {
                 });
             }
 
-            /* //si la conexión con el servidor es exitosa podemos hacer inserciones en la DB
-            const response: any = await createInsertionQuery(data, email); */
+            //si la conexión con el servidor es exitosa y la solicitud es legítima podemos hacer inserciones en la DB
+            const response: any = await createInsertionQuery(data, email);
 
-            res.status(200).json({
-                ok: true,
-                msg: 'ok',
-                data: 'success'
-            });
-
-            /* if (Object.keys(response).length === 0) { //if email is already registered
+            if (Object.keys(response).length === 0) { //if email is already registered
                 res.status(409).json({
                     ok: false,
                     msg: 'El correo ya ha sido registrado. Intente con uno nuevo. (409)'
@@ -101,7 +96,7 @@ export const sendRegistMail = async (req: any, res: any) => {
                     msg: 'ok',
                     data: info.response
                 });
-            } */
+            }
         }
     } catch (error) {
         console.log(error);
