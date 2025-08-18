@@ -55,8 +55,7 @@ export const sendRegistMail = async (req: any, res: any) => {
             if (!isValidHuman) {
                 res.status(403).json({
                     ok: false,
-                    msg: 'ok',
-                    data: 'Se ha detectado actividad inusual al enviar el formulario. Porfavor intente de nuevo.'
+                    msg: 'Se ha detectado actividad inusual al enviar el formulario. Porfavor intente de nuevo.'
                 });
             }
 
