@@ -1,6 +1,7 @@
 import moment from "moment-timezone";
 import { db } from "../utils/db";
 import { PropsGetAssistantsQueries, PropsGetTotalAssistantsQueries } from "../interfaces/IAssistants";
+import { log } from "console";
 
 moment.tz.setDefault('America/Mexico_City');
 
@@ -65,9 +66,16 @@ export const getAssistantsQuery = ({ ...props }: PropsGetAssistantsQueries) => {
 export const getAssistantInfoQuery = (email: string) => {
     return new Promise(async (resolve, reject) => {
         try {
+            const currentYear = moment().format('YYYY');
+            const nextYear = (parseInt(currentYear) + 1).toString();
+
             let assistant = await db.jrn_persona.findFirst({
                 where: {
-                    correo: email ? { contains: email } : {}
+                    correo: email ? { contains: email } : {},
+                    created_at: {
+                        gte: moment.utc(currentYear).toISOString(),
+                        lt: moment.utc(nextYear).toISOString()
+                    }
                 },
                 select: {
                     id: true,
