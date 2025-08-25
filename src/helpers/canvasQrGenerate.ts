@@ -14,8 +14,6 @@ export const generateQr = async (data: PropsSendRegistMailInterface, rutaLogo: s
 
     const content: string = `${data.correo}|${data.modulo === null || data.modulo === 0 ? '' : data.modulo}|${data.talleres.length !== 0 ? talleres : ''}|`;
 
-    console.log(content);
-
     // Generate Qr code as image
     const qrImage = await QRCode.toBuffer(content, {
         width: 250,
