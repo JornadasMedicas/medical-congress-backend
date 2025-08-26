@@ -194,76 +194,73 @@ export const getCountAssistantsQuery = ({ ...props }: PropsGetTotalAssistantsQue
     })
 }
 
-export const updateAttendancesQuery = (assistant: { assistant: string }) => {
+export const updateAttendancesQuery = (assistant: string) => {
     return new Promise(async (resolve, reject) => {
         try {
-            /* const dnow = moment(`${moment().format('YYYY')}-${moment().format('MM')}-${moment().format('DD')}`);
-            const registerDay1 = moment(`${moment().format('YYYY')}-11-20`);
-            const registerDay2 = moment(`${moment().format('YYYY')}-11-21`);
-            const registerDay3 = moment(`${moment().format('YYYY')}-11-22`);
+            const currentYear = moment().format('YYYY');
+            const nextYear = (parseInt(currentYear) + 1).toString();
 
-            console.log('ACTUAL: ', dnow.isBefore(registerDay1), dnow, registerDay1);
-            console.log('OTRO: ', dnow < registerDay1, dnow, registerDay1);
+            const edition = await db.jrn_edicion.findFirst({
+                where: {
+                    edicion: currentYear
+                },
+                select: {
+                    fec_dia_1: true,
+                    fec_dia_2: true,
+                    fec_dia_3: true
+                }
+            });
+            
+            const dnow = moment();
 
-            const splittedData: string[] = assistant.assistant.split('|');
+            const isRegistered = await db.jrn_persona.findFirst({
+                where: {
+                    correo: assistant,
+                    created_at: {
+                        gte: moment.utc(currentYear).toISOString(),
+                        lt: moment.utc(nextYear).toISOString()
+                    }
+                },
+                select: {
+                    id: true
+                }
+            });
+
+            if (!isRegistered) {//if isn't registered
+                return resolve({ ok: false, typeError: 1 });
+            }
+
+            if (dnow.isBefore(edition?.fec_dia_1)) {// if assistance is checked before event begins
+                return resolve({ ok: false, typeError: 2 });
+            }
 
             const isOnCongress = await db.jrn_inscritos_modulos.findFirst({
                 where: {
-                    jrn_persona: { correo: splittedData[0] }
+                    jrn_persona: { correo: assistant }
                 }
             });
 
-            const isOnWorkshop = await db.jrn_inscritos_talleres.findFirst({
+            if (!isOnCongress) {//if isn't registered on congress
+                return resolve({ ok: false, typeError: 3 });
+            }
+
+            await db.jrn_inscritos_modulos.updateMany({
                 where: {
-                    jrn_persona: { correo: splittedData[0] }
+                    id_persona: isRegistered.id
+                },
+                data: {
+                    ...(dnow.isSameOrAfter(edition?.fec_dia_1) && dnow.isBefore(edition?.fec_dia_2)) && {
+                        asistioDia1: true
+                    },
+                    ...(dnow.isSameOrAfter(edition?.fec_dia_2) && dnow.isBefore(edition?.fec_dia_3)) && {
+                        asistioDia2: true
+                    },
+                    ...(dnow.isSameOrAfter(edition?.fec_dia_3)) && {
+                        asistioDia3: true
+                    },
+                    updated_at: moment.utc().subtract(6, 'hour').toISOString()
                 }
             });
-
-            if (isOnCongress) {
-                if (dnow < registerDay1) {// if assistance is checked before event begins
-                    return resolve({ ok: false, typeError: 2 });
-                }
-
-                if (event.modulo !== null) {//if assistant selected a module
-                    if (dnow.isSame(registerDay1)) {
-                        await db.jrn_evento.update({
-                            where: {
-                                id: event.id
-                            },
-                            data: {
-                                isAssistDay1: true,
-                                updated_at: moment.utc().subtract(6, 'hour').toISOString()
-                            }
-                        });
-                    } else if (dnow.isSame(registerDay2)) {
-                        await db.jrn_evento.update({
-                            where: {
-                                id: event.id
-                            },
-                            data: {
-                                isAssistDay2: true,
-                                updated_at: moment.utc().subtract(6, 'hour').toISOString()
-                            }
-                        });
-                    } else if (dnow.isSame(registerDay3)) {
-                        await db.jrn_evento.update({
-                            where: {
-                                id: event.id
-                            },
-                            data: {
-                                isAssistDay3: true,
-                                updated_at: moment.utc().subtract(6, 'hour').toISOString()
-                            }
-                        });
-                    }
-                } else {
-                    resolve({ ok: false, typeError: 3 });
-                }
-
-                resolve(true);
-            } else {
-                resolve({ ok: false, typeError: 1 });
-            } */
 
             resolve(true);
         } catch (error) {

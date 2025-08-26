@@ -77,7 +77,7 @@ export const getTotalAssistants = async (req: any, res: Response) => {
 
 export const updateAttendances = async (req: any, res: Response) => {
     try {
-        const assistant: any = req.body;
+        const { assistant }: { assistant: string } = req.body;
         const query: any = await updateAttendancesQuery(assistant);
 
         if (query.typeError === 1) {
