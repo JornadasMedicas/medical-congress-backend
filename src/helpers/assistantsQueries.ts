@@ -200,19 +200,6 @@ export const updateAttendancesQuery = (assistant: string) => {
             const currentYear = moment().format('YYYY');
             const nextYear = (parseInt(currentYear) + 1).toString();
 
-            const edition = await db.jrn_edicion.findFirst({
-                where: {
-                    edicion: currentYear
-                },
-                select: {
-                    fec_dia_1: true,
-                    fec_dia_2: true,
-                    fec_dia_3: true
-                }
-            });
-            
-            const dnow = moment();
-
             const isRegistered = await db.jrn_persona.findFirst({
                 where: {
                     correo: assistant,
@@ -229,6 +216,19 @@ export const updateAttendancesQuery = (assistant: string) => {
             if (!isRegistered) {//if isn't registered
                 return resolve({ ok: false, typeError: 1 });
             }
+
+            const edition = await db.jrn_edicion.findFirst({
+                where: {
+                    edicion: currentYear
+                },
+                select: {
+                    fec_dia_1: true,
+                    fec_dia_2: true,
+                    fec_dia_3: true
+                }
+            });
+
+            const dnow = moment();
 
             if (dnow.isBefore(edition?.fec_dia_1)) {// if assistance is checked before event begins
                 return resolve({ ok: false, typeError: 2 });
@@ -270,62 +270,102 @@ export const updateAttendancesQuery = (assistant: string) => {
 }
 
 //!IMPORTANT UPDATE EVERY YEAR
-export const updateAttendancesWorkshopsQuery = (assistant: { assistant: string }) => {
+export const updateAttendancesWorkshopsQuery = (assistant: string) => {
     return new Promise(async (resolve, reject) => {
         try {
-            /* const dateT1 = moment(`${moment().format('YYYY')}-11-22 08:00:00`);
-            const dateT2 = moment(`${moment().format('YYYY')}-11-22 15:30:00`);
-            const dateT3 = moment(`${moment().format('YYYY')}-12-20`);
-            const dateT4 = moment(`${moment().format('YYYY')}-12-20`);
-            const dnowWorkshops = moment();
+            const currentYear = moment().format('YYYY');
+            const nextYear = (parseInt(currentYear) + 1).toString();
 
-            if (dnowWorkshops.isBefore(dateT1)) {// if assistance is checked before event begins
-                return resolve({ ok: false, typeError: 2 });
-            }
-
-            const splittedData: string[] = assistant.assistant.split('|');
-
-            const event = await db.jrn_evento.findFirst({
+            const isRegistered = await db.jrn_persona.findFirst({
                 where: {
-                    jrn_persona: { correo: splittedData[0] },
-                    OR: [
-                        { isRegisteredT1: true },
-                        { isRegisteredT2: true }
-                    ]
+                    correo: assistant,
+                    created_at: {
+                        gte: moment.utc(currentYear).toISOString(),
+                        lt: moment.utc(nextYear).toISOString()
+                    }
+                },
+                select: {
+                    id: true
                 }
             });
 
-            if (event) {
-                if (event.isRegisteredT1 && (dnowWorkshops.isSameOrAfter(dateT1) && dnowWorkshops.isSameOrBefore(dateT2))) {
-                    await db.jrn_evento.update({
+            if (!isRegistered) {//if isn't registered
+                return resolve({ ok: false, typeError: 1 });
+            }
+
+            const edition = await db.jrn_edicion.findFirst({
+                where: {
+                    edicion: currentYear
+                },
+                select: {
+                    fec_dia_1: true,
+                    fec_dia_2: true,
+                    fec_dia_3: true
+                }
+            });
+
+            const dnow = moment();
+
+            if (dnow.isBefore(edition?.fec_dia_1)) {// if assistance is checked before event begins
+                return resolve({ ok: false, typeError: 2 });
+            }
+
+            const isOnWorkshops = await db.jrn_inscritos_talleres.findMany({
+                where: {
+                    id_persona: isRegistered.id
+                },
+                select: {
+                    jrn_taller: {
+                        select: {
+                            id: true,
+                            nombre: true,
+                            fecha: true,
+                            hora_inicio: true,
+                            hora_fin: true
+                        }
+                    }
+                }
+            });
+
+            if (isOnWorkshops.length === 0) {//if isn't registered on workshops
+                return resolve({ ok: false, typeError: 3 });
+            }
+
+            const assistance = [];
+
+            //validate this part
+            isOnWorkshops.forEach(async (workshop) => {
+                const workshopDate = moment(workshop.jrn_taller.fecha).format('YYYY-MM-DD').split('-');
+                if (dnow.isSameOrAfter(moment.utc(workshop.jrn_taller.hora_inicio).set({
+                        year: parseInt(workshopDate[0]),
+                        month: parseInt(workshopDate[1]) - 1,
+                        date: parseInt(workshopDate[2]),
+                    })) && dnow.isSameOrBefore(
+                        moment.utc(workshop.jrn_taller.hora_fin).set({
+                            year: parseInt(workshopDate[0]),
+                            month: parseInt(workshopDate[1]) - 1,
+                            date: parseInt(workshopDate[2]),
+                    }))) {
+                    const res = await db.jrn_inscritos_talleres.updateMany({
                         where: {
-                            id: event.id
+                            id_persona: isRegistered.id,
+                            id_taller: workshop.jrn_taller.id
                         },
                         data: {
-                            isAssistT1: true,
+                            asistio: true,
                             updated_at: moment.utc().subtract(6, 'hour').toISOString()
                         }
                     });
-                }
 
-                if (event.isRegisteredT2 && dnowWorkshops.isSameOrAfter(dateT2)) {
-                    await db.jrn_evento.update({
-                        where: {
-                            id: event.id
-                        },
-                        data: {
-                            isAssistT2: true,
-                            updated_at: moment.utc().subtract(6, 'hour').toISOString()
-                        }
-                    });
+                    assistance.push(res);
                 }
+            });
 
-                resolve(event);
+            if (assistance.length === 0) {
+                return resolve({ ok: false, typeError: 2 });
             } else {
-                resolve({ ok: false, typeError: 1 });
-            } */
-
-            resolve(true)
+                return resolve(true);
+            }
         } catch (error) {
             reject(error);
         }
