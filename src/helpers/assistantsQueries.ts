@@ -335,17 +335,22 @@ export const updateAttendancesWorkshopsQuery = (assistant: string) => {
 
             //validate this part
             isOnWorkshops.forEach(async (workshop) => {
-                const workshopDate = moment(workshop.jrn_taller.fecha).format('YYYY-MM-DD').split('-');
-                if (dnow.isSameOrAfter(moment.utc(workshop.jrn_taller.hora_inicio).set({
+                const dnow2 = moment();
+                const workshopDate = moment.utc(workshop.jrn_taller.fecha).format('YYYY-MM-DD').split('-');
+
+                if (dnow2.utc().subtract(6, 'hour').isSameOrAfter(
+                    moment.utc(workshop.jrn_taller.hora_inicio).subtract(1, 'hour').set({
                         year: parseInt(workshopDate[0]),
                         month: parseInt(workshopDate[1]) - 1,
                         date: parseInt(workshopDate[2]),
-                    })) && dnow.isSameOrBefore(
-                        moment.utc(workshop.jrn_taller.hora_fin).set({
-                            year: parseInt(workshopDate[0]),
-                            month: parseInt(workshopDate[1]) - 1,
-                            date: parseInt(workshopDate[2]),
-                    }))) {
+                    })
+                ) && dnow2.utc().subtract(6, 'hour').isSameOrBefore(
+                    moment.utc(workshop.jrn_taller.hora_fin).add(1, 'hour').set({
+                        year: parseInt(workshopDate[0]),
+                        month: parseInt(workshopDate[1]) - 1,
+                        date: parseInt(workshopDate[2]),
+                    })
+                )) {
                     const res = await db.jrn_inscritos_talleres.updateMany({
                         where: {
                             id_persona: isRegistered.id,
@@ -357,6 +362,7 @@ export const updateAttendancesWorkshopsQuery = (assistant: string) => {
                         }
                     });
 
+                    //fix assistance array to check if at least one workshop was updated
                     assistance.push(res);
                 }
             });
