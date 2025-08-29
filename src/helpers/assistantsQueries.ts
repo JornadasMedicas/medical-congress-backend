@@ -331,10 +331,10 @@ export const updateAttendancesWorkshopsQuery = (assistant: string) => {
                 return resolve({ ok: false, typeError: 3 });
             }
 
-            const assistance = [];
+            let assistance: { count: number }[] = [];
 
             //validate this part
-            isOnWorkshops.forEach(async (workshop) => {
+            for (const workshop of isOnWorkshops) {
                 const dnow2 = moment();
                 const workshopDate = moment.utc(workshop.jrn_taller.fecha).format('YYYY-MM-DD').split('-');
 
@@ -361,11 +361,10 @@ export const updateAttendancesWorkshopsQuery = (assistant: string) => {
                             updated_at: moment.utc().subtract(6, 'hour').toISOString()
                         }
                     });
-
-                    //fix assistance array to check if at least one workshop was updated
+                    
                     assistance.push(res);
                 }
-            });
+            }
 
             if (assistance.length === 0) {
                 return resolve({ ok: false, typeError: 2 });
