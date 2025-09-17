@@ -120,7 +120,7 @@ export const updateAttendancesWorkshops = async (req: any, res: Response) => {
         if (query.typeError === 1) {
             res.status(404).json({
                 ok: false,
-                msg: 'El asistente no se encuentra registrado a algún taller.'
+                msg: 'El asistente no se encuentra registrado'
             });
         } else if (query.typeError === 2) {
             res.status(400).json({
