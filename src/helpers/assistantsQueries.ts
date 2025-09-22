@@ -1,7 +1,6 @@
 import moment from "moment-timezone";
 import { db } from "../utils/db";
 import { PropsGetAssistantsQueries, PropsGetTotalAssistantsQueries } from "../interfaces/IAssistants";
-import { log } from "console";
 
 moment.tz.setDefault('America/Mexico_City');
 

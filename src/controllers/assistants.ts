@@ -24,11 +24,20 @@ export const getAssistantInfo = async (req: any, res: Response) => {
     try {
         const email: { email: string } = req.query;
         let assistant = await getAssistantInfoQuery(email.email);
-        res.status(200).json({
-            ok: true,
-            msg: 'Ok',
-            data: assistant
-        });
+
+        if (!assistant) {
+            res.status(404).json({
+                ok: false,
+                msg: 'El asistente no se encuentra registrado en la edición actual.'
+            });
+        } else {
+            res.status(200).json({
+                ok: true,
+                msg: 'Ok',
+                data: assistant
+            });
+        }
+
     } catch (error) {
         console.log(error);
         res.status(500).json({
