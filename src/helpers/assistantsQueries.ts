@@ -261,7 +261,7 @@ export const updateAttendancesQuery = (assistant: string) => {
                 }
             });
 
-            resolve(true);
+            resolve({ ok: true, typeError: 0 });
         } catch (error) {
             reject(error);
         }
@@ -360,7 +360,7 @@ export const updateAttendancesWorkshopsQuery = (assistant: string) => {
                             updated_at: moment.utc().subtract(6, 'hour').toISOString()
                         }
                     });
-                    
+
                     assistance.push(res);
                 }
             }
