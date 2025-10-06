@@ -308,6 +308,8 @@ export const editWorkshopQuery = ({ ...props }: { id: number, nombre: string, cu
                     nombre: props.nombre,
                     cupos: props.cupos,
                     fecha: moment.utc(props.fecha).toISOString(),
+                    hora_inicio: new Date(`${moment().format('YYYY-MM-DD')}T${props.hora_inicio}Z`).toISOString(),
+                    hora_fin: new Date(`${moment().format('YYYY-MM-DD')}T${props.hora_fin}Z`).toISOString(),
                     updated_at: moment.utc().subtract(6, 'hour').toISOString()
                 }
             });
