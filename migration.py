@@ -64,7 +64,7 @@ if __name__ == "__main__":
 
     # -------DATOS jrn_edicion-----------
     cursor2.execute(f"INSERT INTO jrn_edicion(edicion, fec_dia_1, fec_dia_2, fec_dia_3, created_at, updated_at) VALUES('2024', '2024-11-21', '2024-11-22', '2024-11-23', now(), now())")
-    cursor2.execute(f"INSERT INTO jrn_edicion(edicion, fec_dia_1, fec_dia_2, fec_dia_3, created_at, updated_at) VALUES('2025', '2025-11-21', '2025-11-22', '2025-11-23', now(), now())")
+    """ cursor2.execute(f"INSERT INTO jrn_edicion(edicion, fec_dia_1, fec_dia_2, fec_dia_3, created_at, updated_at) VALUES('2025', '2025-11-21', '2025-11-22', '2025-11-23', now(), now())") """
 
     # ------DATOS jrn_modulos-----------
     for modulo in modulos:
