@@ -268,7 +268,6 @@ export const updateAttendancesQuery = (assistant: string) => {
     })
 }
 
-//!IMPORTANT UPDATE EVERY YEAR
 export const updateAttendancesWorkshopsQuery = (assistant: string) => {
     return new Promise(async (resolve, reject) => {
         try {

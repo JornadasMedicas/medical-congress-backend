@@ -213,6 +213,8 @@ export const getWorkshopsQuery = async (): Promise<any[]> => {
                 nombre: true,
                 fecha: true,
                 cupos: true,
+                hora_inicio: true,
+                hora_fin: true,
                 created_at: true,
                 updated_at: true,
                 jrn_modulo: {
@@ -295,7 +297,7 @@ export const createWorkshopQuery = ({ ...props }: PayloadWorkshops) => {
     })
 }
 
-export const editWorkshopQuery = ({ ...props }: { id: number, nombre: string, cupos: number }) => {
+export const editWorkshopQuery = ({ ...props }: { id: number, nombre: string, cupos: number, fecha: string, hora_inicio: string, hora_fin: string }) => {
     return new Promise(async (resolve, reject) => {
         try {
             let res = await db.jrn_talleres.update({
@@ -305,6 +307,7 @@ export const editWorkshopQuery = ({ ...props }: { id: number, nombre: string, cu
                 data: {
                     nombre: props.nombre,
                     cupos: props.cupos,
+                    fecha: moment.utc(props.fecha).toISOString(),
                     updated_at: moment.utc().subtract(6, 'hour').toISOString()
                 }
             });
