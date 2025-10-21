@@ -55,6 +55,15 @@ export const createInsertionQuery = ({ ...props }: PropsSendRegistMailInterface,
                                 }
                             }
                         })
+                    },
+                    select: {
+                        jrn_inscritos_modulos: {
+                            select: {
+                                jrn_modulo: {
+                                    select: { nombre: true, costo: true }
+                                }
+                            }
+                        }
                     }
                 });
 

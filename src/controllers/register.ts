@@ -6,6 +6,7 @@ import { generateQr } from "../helpers/canvasQrGenerate";
 import { createInsertionQuery, getEmailUsed, validateRecaptcha } from "../helpers/registerQueries";
 import { infoEmails } from "../helpers/emailsData";
 import moment from "moment";
+import fs from 'fs';
 
 export const sendRegistMail = async (req: any, res: any) => {
     try {
@@ -61,6 +62,7 @@ export const sendRegistMail = async (req: any, res: any) => {
 
             //si la conexión con el servidor es exitosa y la solicitud es legítima podemos hacer inserciones en la DB
             const response: any = await createInsertionQuery(data, email);
+            console.log(response);
 
             if (Object.keys(response).length === 0) { //if email is already registered
                 res.status(409).json({
@@ -75,13 +77,17 @@ export const sendRegistMail = async (req: any, res: any) => {
             } else { //if all transactions were successfully done
                 const rutaLogo: string = path.join(__dirname, `../../public/cae_logo.png`);
                 const rutaQr: string = await generateQr(data, rutaLogo); //generate and save qr code on public folder
+                let htmlTemplate = fs.readFileSync(path.join(__dirname, '../templates', 'emailRegistro2025.html'), 'utf8');
+                htmlTemplate = htmlTemplate.replace(/{{acronimo}}/g, data.acronimo.trim());
+                htmlTemplate = htmlTemplate.replace(/{{nombre}}/g, data.nombre.trim());
+                htmlTemplate = htmlTemplate.replace(/{{apellido}}/g, data.apellidos.trim());
+                htmlTemplate = htmlTemplate.replace(/{{aniversario}}/g, (parseInt(moment.utc().format('YYYY')) - 1989).toString());
 
                 const info: SMTPTransport.SentMessageInfo = await transporter.sendMail({
                     from: `"Centro de Alta Especialidad Dr. Rafael Lucio" <${email[0].user}>`, // sender address
                     to: `${data.correo.trim()}`, // main receiver
                     subject: `JORNADAS MÉDICAS ${moment.utc().format('YYYY')}`, // Subject line
-                    text: `Estimado ${data.acronimo + ' ' + data.nombre + ' ' + data.apellidos}, el Centro de Alta Especialidad Dr. Rafael Lucio agradece su participación en las Jornadas Médicas ${moment.utc().format('YYYY')}.\nA continuación se muestra adjunto su código QR el cuál deberá descargar y presentar antes de ingresar al evento para registrar su asistencia.
-                    `,
+                    html: htmlTemplate,
                     attachments: [
                         {
                             filename: `${data.correo}.png`,

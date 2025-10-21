@@ -55,6 +55,7 @@ model jrn_modulos {
     id         Int       @id @unique @default(autoincrement()) @db.UnsignedInt
     nombre     String    @unique @db.VarChar(50)
     cupos      Int       @default(0) @db.SmallInt()
+    costo      Int       @default(0) @db.SmallInt()
     created_at DateTime? @default(now()) @db.Timestamp(0)
     updated_at DateTime? @default(now()) @db.Timestamp(0)
     deleted_at DateTime? @db.Timestamp(0)

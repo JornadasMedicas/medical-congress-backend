@@ -91,6 +91,7 @@ export const getModulesQuery = async (): Promise<{ id: number, nombre: string }[
                 id: true,
                 nombre: true,
                 cupos: true,
+                costo: true,
                 created_at: true,
                 updated_at: true
             },
@@ -142,7 +143,7 @@ export const createModuleQuery = (nombre: string) => {
     })
 }
 
-export const editModuleQuery = ({ ...props }: { id: number, nombre: string, cupos: number }) => {
+export const editModuleQuery = ({ ...props }: { id: number, nombre: string, cupos: number, costo: number }) => {
     return new Promise(async (resolve, reject) => {
         try {
             let res = await db.jrn_modulos.update({
@@ -152,6 +153,7 @@ export const editModuleQuery = ({ ...props }: { id: number, nombre: string, cupo
                 data: {
                     nombre: props.nombre,
                     cupos: props.cupos,
+                    costo: props.costo,
                     updated_at: moment.utc().subtract(6, 'hour').toISOString()
                 }
             });
