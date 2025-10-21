@@ -62,7 +62,6 @@ export const sendRegistMail = async (req: any, res: any) => {
 
             //si la conexión con el servidor es exitosa y la solicitud es legítima podemos hacer inserciones en la DB
             const response: any = await createInsertionQuery(data, email);
-            console.log(response);
 
             if (Object.keys(response).length === 0) { //if email is already registered
                 res.status(409).json({
@@ -82,6 +81,8 @@ export const sendRegistMail = async (req: any, res: any) => {
                 htmlTemplate = htmlTemplate.replace(/{{nombre}}/g, data.nombre.trim());
                 htmlTemplate = htmlTemplate.replace(/{{apellido}}/g, data.apellidos.trim());
                 htmlTemplate = htmlTemplate.replace(/{{aniversario}}/g, (parseInt(moment.utc().format('YYYY')) - 1989).toString());
+                htmlTemplate = htmlTemplate.replace(/{{modulo}}/g, response.jrn_inscritos_modulos[0].jrn_modulo.nombre);
+                htmlTemplate = htmlTemplate.replace(/{{costo}}/g, response.jrn_inscritos_modulos[0].jrn_modulo.costo);
 
                 const info: SMTPTransport.SentMessageInfo = await transporter.sendMail({
                     from: `"Centro de Alta Especialidad Dr. Rafael Lucio" <${email[0].user}>`, // sender address
