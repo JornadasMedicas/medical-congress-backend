@@ -147,7 +147,10 @@ export const validateRecaptcha = async (token: string) => {
             }
         });
 
-        if (res.data.success && res.data.score > 0.5) {
+        console.log(res.data.score);
+        
+
+        if (res.data.success && res.data.score >= 0.3) {
             return true;
         } else {
             return false;

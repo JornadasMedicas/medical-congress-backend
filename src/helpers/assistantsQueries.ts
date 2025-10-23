@@ -43,10 +43,21 @@ export const getAssistantsQuery = ({ ...props }: PropsGetAssistantsQueries) => {
                 select: {
                     id: true,
                     acronimo: true,
+                    categoria: true,
                     nombre: true,
                     correo: true,
                     tel: true,
-                    created_at: true
+                    created_at: true,
+                    jrn_inscritos_modulos: {
+                        select: {
+                            jrn_modulo: {
+                                select: { nombre: true, costo: true }
+                            },
+                            jrn_edicion: {
+                                select: { gratuito: true }
+                            }
+                        }
+                    }
                 },
                 orderBy: {
                     id: "desc"

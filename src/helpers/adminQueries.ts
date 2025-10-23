@@ -62,12 +62,13 @@ export const getEventEditionsQuery = async (): Promise<{ id: number, edicion: st
     }
 }
 
-export const createEditionQuery = ({ ...props }: { edicion: string, fec_inicial: string, fec_final: string }) => {
+export const createEditionQuery = ({ ...props }: { edicion: string, fec_inicial: string, fec_final: string, isFree: boolean }) => {
     return new Promise(async (resolve, reject) => {
         try {
             let res = await db.jrn_edicion.create({
                 data: {
                     edicion: props.edicion,
+                    gratuito: props.isFree,
                     fec_dia_1: moment.utc(props.fec_inicial).toISOString(),
                     fec_dia_2: moment.utc(props.fec_inicial).add(1, 'day').toISOString(),
                     fec_dia_3: moment.utc(props.fec_final).toISOString()
