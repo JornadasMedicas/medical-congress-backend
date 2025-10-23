@@ -61,6 +61,9 @@ export const createInsertionQuery = ({ ...props }: PropsSendRegistMailInterface,
                             select: {
                                 jrn_modulo: {
                                     select: { nombre: true, costo: true }
+                                },
+                                jrn_edicion: {
+                                    select: { gratuito: true }
                                 }
                             }
                         }
@@ -148,7 +151,7 @@ export const validateRecaptcha = async (token: string) => {
         });
 
         console.log(res.data.score);
-        
+
 
         if (res.data.success && res.data.score >= 0.3) {
             return true;

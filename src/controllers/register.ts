@@ -75,15 +75,21 @@ export const sendRegistMail = async (req: any, res: any) => {
                 } else { //if all transactions were successfully done
                     const rutaLogo: string = path.join(__dirname, `../../public/cae_logo.png`);
                     const rutaQr: string = await generateQr(data, rutaLogo); //generate and save qr code on public folder
-                    const costo: string = data.categoria.includes('Estudiante') ? '200' : response.jrn_inscritos_modulos[0].jrn_modulo.costo;
+                    let htmlTemplate: string = '';
 
-                    let htmlTemplate = fs.readFileSync(path.join(__dirname, '../templates', 'emailRegistro2025.html'), 'utf8');
+                    if (!response.jrn_inscritos_modulos[0].jrn_edicion.gratuito) { // if congress isn't free
+                        htmlTemplate = fs.readFileSync(path.join(__dirname, '../templates', 'emailRegistroConCosto.html'), 'utf8');
+                        const costo: string = data.categoria.includes('Estudiante') ? '200' : response.jrn_inscritos_modulos[0].jrn_modulo.costo;
+                        htmlTemplate = htmlTemplate.replace(/{{costo}}/g, costo);
+                    } else {
+                        htmlTemplate = fs.readFileSync(path.join(__dirname, '../templates', 'emailRegistroSinCosto.html'), 'utf8');
+                    }
+
                     htmlTemplate = htmlTemplate.replace(/{{acronimo}}/g, data.acronimo.trim());
                     htmlTemplate = htmlTemplate.replace(/{{nombre}}/g, data.nombre.trim());
                     htmlTemplate = htmlTemplate.replace(/{{apellido}}/g, data.apellidos.trim());
                     htmlTemplate = htmlTemplate.replace(/{{aniversario}}/g, (parseInt(moment.utc().format('YYYY')) - 1989).toString());
                     htmlTemplate = htmlTemplate.replace(/{{modulo}}/g, response.jrn_inscritos_modulos[0].jrn_modulo.nombre);
-                    htmlTemplate = htmlTemplate.replace(/{{costo}}/g, costo);
 
                     const info: SMTPTransport.SentMessageInfo = await transporter.sendMail({
                         from: `"Centro de Alta Especialidad Dr. Rafael Lucio" <${email[0].user}>`, // sender address

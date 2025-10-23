@@ -50,7 +50,8 @@ export const getEventEditionsQuery = async (): Promise<{ id: number, edicion: st
             },
             select: {
                 id: true,
-                edicion: true
+                edicion: true,
+                gratuito: true
             },
             orderBy: { id: 'desc' }
         });
