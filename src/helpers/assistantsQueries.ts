@@ -50,6 +50,7 @@ export const getAssistantsQuery = ({ ...props }: PropsGetAssistantsQueries) => {
                     created_at: true,
                     jrn_inscritos_modulos: {
                         select: {
+                            pagado: true,
                             jrn_modulo: {
                                 select: { nombre: true, costo: true }
                             },
@@ -380,6 +381,32 @@ export const updateAttendancesWorkshopsQuery = (assistant: string) => {
             } else {
                 return resolve(true);
             }
+        } catch (error) {
+            reject(error);
+        }
+    })
+}
+
+export const updatePaymentStatusQuery = (isPayed: boolean, id_persona: number) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const paymentStatus = await db.jrn_inscritos_modulos.updateMany({
+                where: {
+                    jrn_persona: {
+                        id: id_persona
+                    }
+                },
+                data: {
+                    pagado: isPayed
+                }
+            });
+
+            if (paymentStatus.count === 0) {
+                resolve(false);
+            } else {
+                resolve(true);
+            }
+
         } catch (error) {
             reject(error);
         }

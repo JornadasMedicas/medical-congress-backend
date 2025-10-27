@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { createCategoryQuery, createEditionQuery, createModuleQuery, createWorkshopQuery, deleteCategoryQuery, deleteModuleQuery, deleteWorkshopQuery, editCategoryQuery, editModuleQuery, editWorkshopQuery, getCategoriesQuery, getCountCatalogsQuery, getEventEditionsQuery, getModulesQuery, getWorkshopsQuery } from "../helpers/adminQueries";
+import { updatePaymentStatusQuery } from "../helpers/assistantsQueries";
 
 export const getCountCatalogs = async (req: any, res: Response) => {
     try {
@@ -86,7 +87,7 @@ export const editModule = async (req: any, res: Response) => {
 }
 
 export const deleteModule = async (req: any, res: Response) => {
-    try {        
+    try {
         let { id } = req.params;
         let reg = await deleteModuleQuery(parseInt(id));
 
@@ -102,7 +103,7 @@ export const deleteModule = async (req: any, res: Response) => {
 export const getWorkshops = async (req: any, res: Response) => {
     try {
         let workshops = await getWorkshopsQuery();
-        
+
         res.status(200).json(workshops)
     } catch (error) {
         console.log(error);
@@ -149,7 +150,7 @@ export const editWorkshop = async (req: any, res: Response) => {
 }
 
 export const deleteWorkshop = async (req: any, res: Response) => {
-    try {        
+    try {
         let { id } = req.params;
         let reg = await deleteWorkshopQuery(parseInt(id));
 
@@ -179,7 +180,7 @@ export const getEventEditions = async (req: any, res: Response) => {
 export const getCategories = async (req: any, res: Response) => {
     try {
         let categories = await getCategoriesQuery();
-        
+
         res.status(200).json(categories)
     } catch (error) {
         console.log(error);
@@ -226,12 +227,34 @@ export const editCategory = async (req: any, res: Response) => {
 }
 
 export const deleteCategory = async (req: any, res: Response) => {
-    try {        
+    try {
         let { id } = req.params;
         let reg = await deleteCategoryQuery(parseInt(id));
 
         res.status(200).json(reg);
     } catch (error: any) {
+        res.status(500).json({
+            ok: false,
+            msg: 'Server error contact the administrator'
+        });
+    }
+}
+
+export const updatePaymentStatus = async (req: any, res: Response) => {
+    try {
+        const { isPayed, id_persona } = req.body;
+        const paymentStatus = await updatePaymentStatusQuery(isPayed, id_persona);
+
+        if (paymentStatus) {
+            res.status(200).json(paymentStatus);
+        } else {
+            res.status(500).json({
+                ok: false,
+                msg: 'Server error contact the administrator'
+            });
+        }
+    } catch (error) {
+        console.log(error);
         res.status(500).json({
             ok: false,
             msg: 'Server error contact the administrator'
