@@ -1,6 +1,7 @@
 import express, { Express } from 'express';
 import { Server as HttpServer } from 'http';
 import { createServer } from 'https';
+import http from 'http';
 import cors from 'cors';
 import routerBase from '../routes/base';
 import routeContact from '../routes/contact';
@@ -22,17 +23,8 @@ class Server {
 
         //express server
         this.app = express();
-        this.port = parseInt(`${process.env.PORT}`);
-
-        //http / https server
-        this.server = process.env.ENVIRONMENT == 'productivo'
-            ? createServer(
-                {
-                    cert: fs.readFileSync('/cert/server.crt'),
-                    key: fs.readFileSync('/cert/server.key')
-                }, this.app
-            )
-            : require('http').createServer(this.app);
+        this.port = parseInt( `${ process.env.PORT }` );
+        this.server = require('http').createServer(this.app);
         
         //initialize sockets
         this.io = require('socket.io')(this.server, {
@@ -64,10 +56,8 @@ class Server {
         this.middlewares();
 
         this.server.listen(this.port, () => {
-            process.env.ENVIRONMENT == 'productivo'
-                ? console.log(`Server Socket Productivo ready in port: ${this.port}...`)
-                : console.log(`Server Socket Pruebas ready in http://localhost: ${this.port}...`);
-        })
+            console.log(`Server running on port: ${this.port}...`);
+        });
     }
 
 }
