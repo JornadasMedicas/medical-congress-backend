@@ -28,8 +28,8 @@ class Server {
         this.server = process.env.ENVIRONMENT == 'productivo'
             ? createServer(
                 {
-                    cert: fs.readFileSync('/cert/ssaver.gob.mx.crt'),
-                    key: fs.readFileSync('/cert/ssaver.gob.mx.key')
+                    cert: fs.readFileSync('/cert/server.crt'),
+                    key: fs.readFileSync('/cert/server.key')
                 }, this.app
             )
             : require('http').createServer(this.app);
