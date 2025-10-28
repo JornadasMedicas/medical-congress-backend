@@ -104,6 +104,11 @@ export const updateAttendances = async (req: any, res: Response) => {
                 ok: false,
                 msg: 'El asistente no se encuentra registrado en algún módulo.'
             });
+        } else if (query.typeError === 4) {
+            res.status(402).json({
+                ok: false,
+                msg: 'El asistente no ha completado el pago de su inscripción.'
+            });
         } else {
             res.status(200).json({
                 ok: true,

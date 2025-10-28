@@ -235,7 +235,8 @@ export const updateAttendancesQuery = (assistant: string) => {
                 select: {
                     fec_dia_1: true,
                     fec_dia_2: true,
-                    fec_dia_3: true
+                    fec_dia_3: true,
+                    gratuito: true
                 }
             });
 
@@ -248,11 +249,20 @@ export const updateAttendancesQuery = (assistant: string) => {
             const isOnCongress = await db.jrn_inscritos_modulos.findFirst({
                 where: {
                     jrn_persona: { correo: assistant }
+                },
+                select: {
+                    pagado: true
                 }
             });
 
             if (!isOnCongress) {//if isn't registered on congress
                 return resolve({ ok: false, typeError: 3 });
+            }
+
+            if (!edition?.gratuito) {//if edition isn't free, attendance payment tracking
+                if (!isOnCongress?.pagado) {//if hasn't paid yet
+                    return resolve({ ok: false, typeError: 4 });
+                }
             }
 
             await db.jrn_inscritos_modulos.updateMany({
