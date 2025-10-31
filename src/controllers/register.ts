@@ -78,7 +78,7 @@ export const sendRegistMail = async (req: any, res: any) => {
                     let htmlTemplate: string = '';
 
                     if (!response.jrn_inscritos_modulos[0].jrn_edicion.gratuito) { // if congress isn't free
-                        htmlTemplate = fs.readFileSync(path.join(__dirname, '../templates', 'emailRegistroConCosto.html'), 'utf8');
+                        htmlTemplate = fs.readFileSync(path.join(__dirname, '../templates', 'emailPreRegistro.html'), 'utf8');
                         const costo: string = data.categoria.includes('Estudiante') ? '200' : response.jrn_inscritos_modulos[0].jrn_modulo.costo;
                         htmlTemplate = htmlTemplate.replace(/{{costo}}/g, costo);
                     } else {
