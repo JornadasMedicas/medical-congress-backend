@@ -34,8 +34,9 @@ export const createInsertionQuery = ({ ...props }: PropsSendRegistMailInterface,
                         created_at: moment.utc().subtract(6, 'hour').toISOString(), //gmt -6
                         updated_at: moment.utc().subtract(6, 'hour').toISOString(),
                         qr_enviado: true,
-                        clabe_enviada: false,
+                        clabe_enviada: true,
                         qr_enviado_at: moment.utc().subtract(6, 'hour').toISOString(),
+                        clabe_enviada_at: moment.utc().subtract(6, 'hour').toISOString(),
                         email_registro: email[0].user,
                         ...((props.modulo !== 0 && props.modulo !== null) && {
                             jrn_inscritos_modulos: {
