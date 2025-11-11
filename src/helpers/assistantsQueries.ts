@@ -39,6 +39,7 @@ export const getAssistantsQuery = ({ ...props }: PropsGetAssistantsQueries) => {
                             }
                         ]
                     }),
+                    deleted_at: null
                 },
                 select: {
                     id: true,
@@ -86,7 +87,8 @@ export const getAssistantInfoQuery = (email: string) => {
                     created_at: {
                         gte: moment.utc(currentYear).toISOString(),
                         lt: moment.utc(nextYear).toISOString()
-                    }
+                    },
+                    deleted_at: null
                 },
                 select: {
                     id: true,
@@ -138,7 +140,8 @@ export const getAssistantsAutocompleteQuery = (params: { filter: string, edicion
                     OR: [
                         { nombre: params.filter ? { contains: params.filter } : {} },
                         { correo: params.filter ? { contains: params.filter } : {} }
-                    ]
+                    ],
+                    deleted_at: null
                 },
                 select: {
                     id: true,
@@ -190,6 +193,7 @@ export const getCountAssistantsQuery = ({ ...props }: PropsGetTotalAssistantsQue
                             }
                         ]
                     }),
+                    deleted_at: null
                 },
             });
 
