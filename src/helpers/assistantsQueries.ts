@@ -401,7 +401,7 @@ export const updateAttendancesWorkshopsQuery = (assistant: string) => {
     })
 }
 
-export const updatePaymentStatusQuery = (isPayed: boolean, id_persona: number) => {
+export const updatePaymentStatusQuery = (isPayed: number, id_persona: number) => {
     return new Promise(async (resolve, reject) => {
         try {
             const paymentStatus = await db.jrn_inscritos_modulos.updateMany({

@@ -107,7 +107,7 @@ model jrn_inscritos_modulos {
     asistioDia1           Boolean   @default(false) @db.TinyInt()
     asistioDia2           Boolean   @default(false) @db.TinyInt()
     asistioDia3           Boolean   @default(false) @db.TinyInt()
-    pagado                Boolean   @default(false) @db.TinyInt()
+    pagado                Int       @default(0) @db.TinyInt()
     hoja                  Int?      @db.UnsignedInt
     folio                 Int?      @db.UnsignedInt
     constancia_enviada    Boolean   @default(false) @db.TinyInt()
