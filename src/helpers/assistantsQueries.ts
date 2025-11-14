@@ -264,7 +264,7 @@ export const updateAttendancesQuery = (assistant: string) => {
             }
 
             if (!edition?.gratuito) {//if edition isn't free, attendance payment tracking
-                if (!isOnCongress?.pagado) {//if hasn't paid yet
+                if (isOnCongress?.pagado === 0) {//if hasn't paid yet or has scholarship
                     return resolve({ ok: false, typeError: 4 });
                 }
             }
