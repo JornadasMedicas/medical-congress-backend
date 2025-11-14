@@ -1,6 +1,10 @@
 import { Request, Response } from "express";
 import { createCategoryQuery, createEditionQuery, createModuleQuery, createWorkshopQuery, deleteCategoryQuery, deleteModuleQuery, deleteWorkshopQuery, editCategoryQuery, editModuleQuery, editWorkshopQuery, getCategoriesQuery, getCountCatalogsQuery, getEventEditionsQuery, getModulesQuery, getWorkshopsQuery } from "../helpers/adminQueries";
 import { updatePaymentStatusQuery } from "../helpers/assistantsQueries";
+import { chromium } from 'playwright';
+import format from 'string-template';
+import fs from 'fs';
+import path from "path";
 
 export const getCountCatalogs = async (req: any, res: Response) => {
     try {
@@ -258,6 +262,45 @@ export const updatePaymentStatus = async (req: any, res: Response) => {
         res.status(500).json({
             ok: false,
             msg: 'Server error contact the administrator'
+        });
+    }
+}
+
+export const printPdfVoucher = async (req: any, res: Response) => { //func para generar voucher de pago
+    try {
+        //get params from front-end
+        const params: any = req.query;
+
+        const templatePath = path.join(__dirname, "../templates/voucherPagoEfectivo.html");
+        const html = fs.readFileSync(templatePath, "utf8");
+        const template = format(html, params);
+
+        const browser = await chromium.launch();
+
+        const page = await browser.newPage();
+
+        await page.setContent(template);
+        const pdfBuffer = await page.pdf({ 
+            format: 'Letter',
+            margin: {
+                top: 22,
+                right: 22,
+                bottom: 22,
+                left: 22
+            },
+            scale: 0.95,
+            printBackground: true
+        });
+
+        await browser.close();
+
+        res.contentType("application/pdf");
+        res.send(pdfBuffer);
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({
+            ok: false,
+            msg: err
         });
     }
 }
