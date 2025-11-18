@@ -1,10 +1,11 @@
 import { Request, Response } from "express";
 import { createCategoryQuery, createEditionQuery, createModuleQuery, createWorkshopQuery, deleteCategoryQuery, deleteModuleQuery, deleteWorkshopQuery, editCategoryQuery, editModuleQuery, editWorkshopQuery, getCategoriesQuery, getCountCatalogsQuery, getEventEditionsQuery, getModulesQuery, getWorkshopsQuery } from "../helpers/adminQueries";
-import { updatePaymentStatusQuery } from "../helpers/assistantsQueries";
+import { getSingleVoucherFolium, getVoucherFoliums, setVoucherFolium, updatePaymentStatusQuery } from "../helpers/assistantsQueries";
 import { chromium } from 'playwright';
 import format from 'string-template';
 import fs from 'fs';
 import path from "path";
+import moment from "moment";
 
 export const getCountCatalogs = async (req: any, res: Response) => {
     try {
@@ -268,8 +269,30 @@ export const updatePaymentStatus = async (req: any, res: Response) => {
 
 export const printPdfVoucher = async (req: any, res: Response) => { //func para generar voucher de pago
     try {
-        //get params from front-end
-        const params: any = req.query;
+        let params: any = req.query;
+        let lastFolium = 0;
+
+        const hasFolium = await getSingleVoucherFolium(parseInt(params.id));
+
+        if (hasFolium.folio_voucher) { //si ya tiene un folio asignado se vuelve a imprimir con su folio
+            lastFolium = hasFolium.folio_voucher;
+        } else { //si no
+            const foliums = await getVoucherFoliums(); //obtiene todos los folios si hay
+            if (foliums.length === 0) { //si no hay folios asignados aún
+                const res = await setVoucherFolium(hasFolium.id, lastFolium);
+                lastFolium = res.folio_voucher != null ? res.folio_voucher : 0; 
+            } else {
+                lastFolium = foliums[0].folio_voucher != null ? foliums[0].folio_voucher : 0; 
+                const res = await setVoucherFolium(hasFolium.id, lastFolium);
+                lastFolium = res.folio_voucher != null ? res.folio_voucher : 0; 
+            }
+        }
+
+        params = {
+            ...params,
+            folio: lastFolium,
+            current_day: moment.utc().format('DD')
+        }
 
         const templatePath = path.join(__dirname, "../templates/voucherPagoEfectivo.html");
         const html = fs.readFileSync(templatePath, "utf8");
@@ -280,7 +303,7 @@ export const printPdfVoucher = async (req: any, res: Response) => { //func para 
         const page = await browser.newPage();
 
         await page.setContent(template);
-        const pdfBuffer = await page.pdf({ 
+        const pdfBuffer = await page.pdf({
             format: 'Letter',
             margin: {
                 top: 22,

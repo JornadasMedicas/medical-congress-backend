@@ -40,6 +40,13 @@
         span {
             font-style: italic;
         }
+
+        div.sign {
+            border-bottom: 1px solid black;
+            width: 300px;
+            display: flex;
+            justify-content: center;
+        }
     </style>
 </head>
 
@@ -49,31 +56,68 @@
             <div class="label col-sm-12">
                 <h6>Comprobante de Cuota de Recuperación</h6>
             </div>
+            <div class="col-sm-12 d-flex justify-content-end p-2">
+                <p><b style="text-decoration: underline;">Folio: {folio}</b></p>
+            </div>
             <div class="paragraph">
-                <p>Se recibe de: <b>{{asistente}}</b> la cantidad de <b>${{costo}} (cantidad expresada en texto)</b></p>
-                <p>
+                <p>Se recibe de: <b>{asistente}</b> la cantidad de <b>{costo}.00 ({costoTexto})</b></p>
+                <p class="mb-3">
                     por concepto de <b>Aportación Voluntaria</b> de asistencia y participación en el <b>9° Congreso
-                        Académico</b> al módulo {{modulo}} en el marco de los festejos del <b>XXXVI Aniversario de fundación del Centro de
-                        Alta Especialidad Dr. Rafael Lucio</b>, evento anual denominado <b>Jornadas Médicas CAE
-                        2025</b>, mismo que organiza la <b>Subdirección de Enseñanza, Investigación y Capacitación</b>
+                        Académico</b> al módulo <b>{modulo}</b> que organiza la <b>Subdirección de Enseñanza, Investigación y
+                    Capacitación</b>
                     como actividad coadyuvante en refuerzo del saber y del conocimiento en el carácter de funcionar como
                     Hospital Escuela en la Ciudad.
-                    <span>
-                        Esta aportación económica realizada adquiere el carácter de cuota de recuperación y es destinada exclusivamente para cubrir gastos de la organización y operación del evento sin fines de lucro.
-                    </span>
                 </p>
-                <p class="mt-3" style="display: flex; justify-content: center;">Xalapa, Veracruz. a {{current_day}} de Noviembre de 2025.</p>
+                <span style="word-break: break-all;">
+                    Esta aportación económica realizada adquiere el carácter de cuota de recuperación y es destinada
+                    exclusivamente para cubrir gastos de la organización y operación del evento, sin fines de lucro.
+                </span>
+                <p class="mt-3" style="display: flex; justify-content: center;">Xalapa, Veracruz. a {current_day} de
+                    Noviembre de 2025.</p>
             </div>
-            <div class="label col-sm-12">
-                <h6>Copia de Comprobante para control de la Organización del Evento</h6>
+            <div class="col-sm-12 mt-3 d-flex justify-content-center flex-column align-items-center">
+                <p class="mb-3">Asistente</p>
+                <div class="sign">
+                    <p>{asistente}</p>
+                </div>
+                <p>Firma</p>
+            </div>
+            <div class="col-sm-12 mt-1 d-flex justify-content-center">
+                <span style="text-align: center;">He leído y aceptado los términos del presente comprobante.</span>
+            </div>
+            <div class="label col-sm-12 mt-1">
+                <h6>Copia de Comprobante control de la Organización del Evento</h6>
             </div>
         </div>
         <div class="row g-0 m-0 p-2 align-items-center w-100">
-            <div class="col-sm-6">
-                <img width="90%" height="65px" src="data:image/png;base64, {imga}" />
+            <div class="label col-sm-12">
+                <h6>Comprobante de Cuota de Recuperación</h6>
             </div>
-            <div class="col-sm-6 d-flex justify-content-end">
-                <img width="70px" height="70px" src="data:image/png;base64, {imgb}" />
+            <div class="col-sm-12 d-flex justify-content-end p-2">
+                <p><b style="text-decoration: underline;">Folio: {folio}</b></p>
+            </div>
+            <div class="paragraph">
+                <p>Se recibe de: <b>{asistente}</b> la cantidad de <b>{costo}.00 ({costoTexto})</b></p>
+                <p class="mb-3">
+                    por concepto de <b>Aportación Voluntaria</b> de asistencia y participación en el <b>9° Congreso
+                        Académico</b> al módulo <b>{modulo}</b> que organiza la <b>Subdirección de Enseñanza, Investigación y
+                    Capacitación</b>
+                    como actividad coadyuvante en refuerzo del saber y del conocimiento en el carácter de funcionar como
+                    Hospital Escuela en la Ciudad.
+                </p>
+                <span style="word-break: break-all;">
+                    Esta aportación económica realizada adquiere el carácter de cuota de recuperación y es destinada
+                    exclusivamente para cubrir gastos de la organización y operación del evento, sin fines de lucro.
+                </span>
+                <p class="mt-3" style="display: flex; justify-content: center;">Xalapa, Veracruz. a {current_day} de
+                    Noviembre de 2025.</p>
+            </div>
+            <div class="col-sm-12 mt-3 mb-3 d-flex justify-content-center flex-column align-items-center">
+                <p><b>Recibido</b></p>
+                <p><b>Comité Organizador del 9° Congreso Académico</b></p>
+            </div>
+            <div class="label col-sm-12 mt-1">
+                <h6>Copia de Comprobante para Asistente del Evento</h6>
             </div>
         </div>
     </section>

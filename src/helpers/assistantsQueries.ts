@@ -426,3 +426,77 @@ export const updatePaymentStatusQuery = (isPayed: number, id_persona: number) =>
         }
     })
 }
+
+export const getVoucherFoliums = (): Promise<{ id: number, folio_voucher: number | null }[]> => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const currentYear = moment().format('YYYY');
+            const nextYear = (parseInt(currentYear) + 1).toString();
+
+            const foliums: any = await db.jrn_inscritos_modulos.findMany({
+                where: {
+                    jrn_persona: {
+                        created_at: {
+                            gte: moment.utc(currentYear).toISOString(),
+                            lt: moment.utc(nextYear).toISOString()
+                        }
+                    },
+                    folio_voucher: { not: null }
+                },
+                select: {
+                    id: true,
+                    folio_voucher: true
+                },
+                orderBy: { folio_voucher: 'desc' }
+            });
+
+            resolve(foliums);
+        } catch (error) {
+            reject(error);
+        }
+    })
+}
+
+export const getSingleVoucherFolium = (id: number): Promise<{ id: number, folio_voucher: number | null }> => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const folium: any = await db.jrn_inscritos_modulos.findFirst({
+                where: {
+                    jrn_persona: {
+                        id
+                    }
+                },
+                select: {
+                    id: true,
+                    folio_voucher: true
+                }
+            });
+
+            resolve(folium);
+        } catch (error) {
+            reject(error);
+        }
+    })
+}
+
+export const setVoucherFolium = (id: number, currentFolium: number): Promise<{ id: number, folio_voucher: number | null }> => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const folium: any = await db.jrn_inscritos_modulos.update({
+                where: {
+                    id
+                },
+                data: {
+                    folio_voucher: currentFolium + 1
+                },
+                select: {
+                    folio_voucher: true
+                }
+            });
+
+            resolve(folium);
+        } catch (error) {
+            reject(error);
+        }
+    })
+}

@@ -34,11 +34,19 @@ const getAssistantInfo = (req, res) => __awaiter(void 0, void 0, void 0, functio
     try {
         const email = req.query;
         let assistant = yield (0, assistantsQueries_1.getAssistantInfoQuery)(email.email);
-        res.status(200).json({
-            ok: true,
-            msg: 'Ok',
-            data: assistant
-        });
+        if (!assistant) {
+            res.status(404).json({
+                ok: false,
+                msg: 'El asistente no se encuentra registrado en la edición actual.'
+            });
+        }
+        else {
+            res.status(200).json({
+                ok: true,
+                msg: 'Ok',
+                data: assistant
+            });
+        }
     }
     catch (error) {
         console.log(error);
@@ -89,7 +97,7 @@ const getTotalAssistants = (req, res) => __awaiter(void 0, void 0, void 0, funct
 exports.getTotalAssistants = getTotalAssistants;
 const updateAttendances = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const assistant = req.body;
+        const { assistant } = req.body;
         const query = yield (0, assistantsQueries_1.updateAttendancesQuery)(assistant);
         if (query.typeError === 1) {
             res.status(404).json({
@@ -107,6 +115,12 @@ const updateAttendances = (req, res) => __awaiter(void 0, void 0, void 0, functi
             res.status(404).json({
                 ok: false,
                 msg: 'El asistente no se encuentra registrado en algún módulo.'
+            });
+        }
+        else if (query.typeError === 4) {
+            res.status(402).json({
+                ok: false,
+                msg: 'El asistente no ha completado el pago de su inscripción.'
             });
         }
         else {
@@ -128,18 +142,24 @@ const updateAttendances = (req, res) => __awaiter(void 0, void 0, void 0, functi
 exports.updateAttendances = updateAttendances;
 const updateAttendancesWorkshops = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const assistant = req.body;
+        const { assistant } = req.body;
         const query = yield (0, assistantsQueries_1.updateAttendancesWorkshopsQuery)(assistant);
         if (query.typeError === 1) {
             res.status(404).json({
                 ok: false,
-                msg: 'El asistente no se encuentra registrado a algún taller.'
+                msg: 'El asistente no se encuentra registrado'
             });
         }
         else if (query.typeError === 2) {
             res.status(400).json({
                 ok: false,
                 msg: 'Aún no es posible registrar asistencias. Espere al día y hora del taller.'
+            });
+        }
+        else if (query.typeError === 3) {
+            res.status(404).json({
+                ok: false,
+                msg: 'El asistente no se encuentra registrado en algún taller.'
             });
         }
         else {

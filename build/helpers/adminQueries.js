@@ -23,7 +23,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteCategoryQuery = exports.editCategoryQuery = exports.createCategoryQuery = exports.getCategoriesQuery = exports.createWorkshopQuery = exports.getWorkshopsQuery = exports.deleteModuleQuery = exports.editModuleQuery = exports.createModuleQuery = exports.getModulesQuery = exports.createEditionQuery = exports.getEventEditionsQuery = exports.getCountCatalogsQuery = void 0;
+exports.deleteCategoryQuery = exports.editCategoryQuery = exports.createCategoryQuery = exports.getCategoriesQuery = exports.deleteWorkshopQuery = exports.editWorkshopQuery = exports.createWorkshopQuery = exports.getWorkshopsQuery = exports.deleteModuleQuery = exports.updateModuleCounter = exports.editModuleQuery = exports.createModuleQuery = exports.getModulesQuery = exports.createEditionQuery = exports.getEventEditionsQuery = exports.getCountCatalogsQuery = void 0;
 const moment_1 = __importDefault(require("moment"));
 const db_1 = require("../utils/db");
 const getCountCatalogsQuery = () => {
@@ -71,7 +71,8 @@ const getEventEditionsQuery = () => __awaiter(void 0, void 0, void 0, function* 
             },
             select: {
                 id: true,
-                edicion: true
+                edicion: true,
+                gratuito: true
             },
             orderBy: { id: 'desc' }
         });
@@ -90,6 +91,7 @@ const createEditionQuery = (_a) => {
             let res = yield db_1.db.jrn_edicion.create({
                 data: {
                     edicion: props.edicion,
+                    gratuito: props.isFree,
                     fec_dia_1: moment_1.default.utc(props.fec_inicial).toISOString(),
                     fec_dia_2: moment_1.default.utc(props.fec_inicial).add(1, 'day').toISOString(),
                     fec_dia_3: moment_1.default.utc(props.fec_final).toISOString()
@@ -112,6 +114,8 @@ const getModulesQuery = () => __awaiter(void 0, void 0, void 0, function* () {
             select: {
                 id: true,
                 nombre: true,
+                cupos: true,
+                costo: true,
                 created_at: true,
                 updated_at: true
             },
@@ -173,6 +177,8 @@ const editModuleQuery = (_a) => {
                 },
                 data: {
                     nombre: props.nombre,
+                    cupos: props.cupos,
+                    costo: props.costo,
                     updated_at: moment_1.default.utc().subtract(6, 'hour').toISOString()
                 }
             });
@@ -184,6 +190,27 @@ const editModuleQuery = (_a) => {
     }));
 };
 exports.editModuleQuery = editModuleQuery;
+const updateModuleCounter = (_a) => {
+    var props = __rest(_a, []);
+    return new Promise((resolve, reject) => __awaiter(void 0, void 0, void 0, function* () {
+        try {
+            let res = yield db_1.db.jrn_modulos.update({
+                where: {
+                    id: props.id
+                },
+                data: {
+                    cupos: props.cupos,
+                    updated_at: moment_1.default.utc().subtract(6, 'hour').toISOString()
+                }
+            });
+            resolve(res);
+        }
+        catch (error) {
+            reject(error);
+        }
+    }));
+};
+exports.updateModuleCounter = updateModuleCounter;
 const deleteModuleQuery = (id) => {
     return new Promise((resolve, reject) => __awaiter(void 0, void 0, void 0, function* () {
         try {
@@ -211,7 +238,25 @@ const getWorkshopsQuery = () => __awaiter(void 0, void 0, void 0, function* () {
             },
             select: {
                 id: true,
-                nombre: true
+                nombre: true,
+                fecha: true,
+                cupos: true,
+                hora_inicio: true,
+                hora_fin: true,
+                created_at: true,
+                updated_at: true,
+                jrn_modulo: {
+                    select: {
+                        id: true,
+                        nombre: true
+                    }
+                },
+                jrn_edicion: {
+                    select: {
+                        id: true,
+                        edicion: true
+                    }
+                },
             },
             orderBy: { id: 'asc' }
         });
@@ -264,6 +309,7 @@ const createWorkshopQuery = (_a) => {
                         fecha: (0, moment_1.default)(props.fecha).toISOString(),
                         hora_inicio: iso_ini,
                         hora_fin: iso_fin,
+                        cupos: props.cupos,
                         id_modulo: props.modulo,
                         id_edicion: props.edicion,
                         created_at: moment_1.default.utc().subtract(6, 'hour').toISOString(),
@@ -280,6 +326,50 @@ const createWorkshopQuery = (_a) => {
     }));
 };
 exports.createWorkshopQuery = createWorkshopQuery;
+const editWorkshopQuery = (_a) => {
+    var props = __rest(_a, []);
+    return new Promise((resolve, reject) => __awaiter(void 0, void 0, void 0, function* () {
+        try {
+            let res = yield db_1.db.jrn_talleres.update({
+                where: {
+                    id: props.id
+                },
+                data: {
+                    nombre: props.nombre,
+                    cupos: props.cupos,
+                    fecha: moment_1.default.utc(props.fecha).toISOString(),
+                    hora_inicio: new Date(`${(0, moment_1.default)().format('YYYY-MM-DD')}T${props.hora_inicio}Z`).toISOString(),
+                    hora_fin: new Date(`${(0, moment_1.default)().format('YYYY-MM-DD')}T${props.hora_fin}Z`).toISOString(),
+                    updated_at: moment_1.default.utc().subtract(6, 'hour').toISOString()
+                }
+            });
+            resolve(res);
+        }
+        catch (error) {
+            reject(error);
+        }
+    }));
+};
+exports.editWorkshopQuery = editWorkshopQuery;
+const deleteWorkshopQuery = (id) => {
+    return new Promise((resolve, reject) => __awaiter(void 0, void 0, void 0, function* () {
+        try {
+            let res = yield db_1.db.jrn_talleres.update({
+                where: {
+                    id
+                },
+                data: {
+                    deleted_at: moment_1.default.utc().subtract(6, 'hour').toISOString()
+                }
+            });
+            resolve(res);
+        }
+        catch (error) {
+            reject(error);
+        }
+    }));
+};
+exports.deleteWorkshopQuery = deleteWorkshopQuery;
 const getCategoriesQuery = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
         let categories = yield db_1.db.jrn_categorias.findMany({

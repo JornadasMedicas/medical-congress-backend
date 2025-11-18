@@ -23,7 +23,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateAttendancesWorkshopsQuery = exports.updateAttendancesQuery = exports.getCountAssistantsQuery = exports.getAssistantsAutocompleteQuery = exports.getAssistantInfoQuery = exports.getAssistantsQuery = void 0;
+exports.updatePaymentStatusQuery = exports.updateAttendancesWorkshopsQuery = exports.updateAttendancesQuery = exports.getCountAssistantsQuery = exports.getAssistantsAutocompleteQuery = exports.getAssistantInfoQuery = exports.getAssistantsQuery = void 0;
 const moment_timezone_1 = __importDefault(require("moment-timezone"));
 const db_1 = require("../utils/db");
 moment_timezone_1.default.tz.setDefault('America/Mexico_City');
@@ -34,17 +34,16 @@ const getAssistantsQuery = (_a) => {
             const rowsPerPage = parseInt(props.limit);
             const min = ((parseInt(props.page) + 1) * rowsPerPage) - rowsPerPage;
             let listAssistants = yield db_1.db.jrn_persona.findMany({
-                where: {
-                    correo: props.email ? { contains: props.email } : {},
+                where: Object.assign(Object.assign({ correo: props.email ? { contains: props.email } : {}, created_at: {
+                        gte: moment_timezone_1.default.utc(props.year).toISOString(),
+                        lt: moment_timezone_1.default.utc(props.year).add(1, 'year').toISOString()
+                    } }, ((props.module !== '' || props.workshop !== '') && {
                     OR: [
                         {
                             jrn_inscritos_modulos: {
                                 some: {
                                     jrn_modulo: {
-                                        nombre: props.module === '' && props.workshop === '' ? {} : props.module,
-                                    },
-                                    jrn_edicion: {
-                                        edicion: props.year
+                                        nombre: props.module,
                                     }
                                 }
                             },
@@ -53,23 +52,32 @@ const getAssistantsQuery = (_a) => {
                             jrn_inscritos_talleres: {
                                 some: {
                                     jrn_taller: {
-                                        id: props.workshop ? parseInt(props.workshop) : 0,
-                                        jrn_edicion: {
-                                            edicion: props.year
-                                        }
+                                        id: props.workshop ? parseInt(props.workshop) : 0
                                     },
                                 }
                             },
                         }
                     ]
-                },
+                })), { deleted_at: null }),
                 select: {
                     id: true,
                     acronimo: true,
+                    categoria: true,
                     nombre: true,
                     correo: true,
                     tel: true,
-                    created_at: true
+                    created_at: true,
+                    jrn_inscritos_modulos: {
+                        select: {
+                            pagado: true,
+                            jrn_modulo: {
+                                select: { nombre: true, costo: true }
+                            },
+                            jrn_edicion: {
+                                select: { gratuito: true }
+                            }
+                        }
+                    }
                 },
                 orderBy: {
                     id: "desc"
@@ -88,9 +96,16 @@ exports.getAssistantsQuery = getAssistantsQuery;
 const getAssistantInfoQuery = (email) => {
     return new Promise((resolve, reject) => __awaiter(void 0, void 0, void 0, function* () {
         try {
+            const currentYear = (0, moment_timezone_1.default)().format('YYYY');
+            const nextYear = (parseInt(currentYear) + 1).toString();
             let assistant = yield db_1.db.jrn_persona.findFirst({
                 where: {
-                    correo: email ? { contains: email } : {}
+                    correo: email ? { contains: email } : {},
+                    created_at: {
+                        gte: moment_timezone_1.default.utc(currentYear).toISOString(),
+                        lt: moment_timezone_1.default.utc(nextYear).toISOString()
+                    },
+                    deleted_at: null
                 },
                 select: {
                     id: true,
@@ -135,10 +150,15 @@ const getAssistantsAutocompleteQuery = (params) => {
         try {
             let listAssistants = yield db_1.db.jrn_persona.findMany({
                 where: {
+                    created_at: {
+                        gte: moment_timezone_1.default.utc(params.edicion).toISOString(),
+                        lt: moment_timezone_1.default.utc(params.edicion).add(1, 'year').toISOString()
+                    },
                     OR: [
                         { nombre: params.filter ? { contains: params.filter } : {} },
                         { correo: params.filter ? { contains: params.filter } : {} }
-                    ]
+                    ],
+                    deleted_at: null
                 },
                 select: {
                     id: true,
@@ -163,17 +183,16 @@ const getCountAssistantsQuery = (_a) => {
     return new Promise((resolve, reject) => __awaiter(void 0, void 0, void 0, function* () {
         try {
             let countListAssistants = yield db_1.db.jrn_persona.count({
-                where: {
-                    correo: props.email ? { contains: props.email } : {},
+                where: Object.assign(Object.assign({ correo: props.email ? { contains: props.email } : {}, created_at: {
+                        gte: moment_timezone_1.default.utc(props.year).toISOString(),
+                        lt: moment_timezone_1.default.utc(props.year).add(1, 'year').toISOString()
+                    } }, ((props.module !== '' || props.workshop !== '') && {
                     OR: [
                         {
                             jrn_inscritos_modulos: {
                                 some: {
                                     jrn_modulo: {
-                                        nombre: props.module === '' && props.workshop === '' ? {} : props.module,
-                                    },
-                                    jrn_edicion: {
-                                        edicion: props.year
+                                        nombre: props.module,
                                     }
                                 }
                             },
@@ -182,16 +201,13 @@ const getCountAssistantsQuery = (_a) => {
                             jrn_inscritos_talleres: {
                                 some: {
                                     jrn_taller: {
-                                        id: props.workshop ? parseInt(props.workshop) : 0,
-                                        jrn_edicion: {
-                                            edicion: props.year
-                                        }
+                                        id: props.workshop ? parseInt(props.workshop) : 0
                                     },
                                 }
                             },
                         }
                     ]
-                },
+                })), { deleted_at: null }),
             });
             countListAssistants ? (resolve(countListAssistants)) : resolve(0);
         }
@@ -205,74 +221,67 @@ exports.getCountAssistantsQuery = getCountAssistantsQuery;
 const updateAttendancesQuery = (assistant) => {
     return new Promise((resolve, reject) => __awaiter(void 0, void 0, void 0, function* () {
         try {
-            /* const dnow = moment(`${moment().format('YYYY')}-${moment().format('MM')}-${moment().format('DD')}`);
-            const registerDay1 = moment(`${moment().format('YYYY')}-11-20`);
-            const registerDay2 = moment(`${moment().format('YYYY')}-11-21`);
-            const registerDay3 = moment(`${moment().format('YYYY')}-11-22`);
-
-            console.log('ACTUAL: ', dnow.isBefore(registerDay1), dnow, registerDay1);
-            console.log('OTRO: ', dnow < registerDay1, dnow, registerDay1);
-
-            const splittedData: string[] = assistant.assistant.split('|');
-
-            const isOnCongress = await db.jrn_inscritos_modulos.findFirst({
+            const currentYear = (0, moment_timezone_1.default)().format('YYYY');
+            const nextYear = (parseInt(currentYear) + 1).toString();
+            const isRegistered = yield db_1.db.jrn_persona.findFirst({
                 where: {
-                    jrn_persona: { correo: splittedData[0] }
-                }
-            });
-
-            const isOnWorkshop = await db.jrn_inscritos_talleres.findFirst({
-                where: {
-                    jrn_persona: { correo: splittedData[0] }
-                }
-            });
-
-            if (isOnCongress) {
-                if (dnow < registerDay1) {// if assistance is checked before event begins
-                    return resolve({ ok: false, typeError: 2 });
-                }
-
-                if (event.modulo !== null) {//if assistant selected a module
-                    if (dnow.isSame(registerDay1)) {
-                        await db.jrn_evento.update({
-                            where: {
-                                id: event.id
-                            },
-                            data: {
-                                isAssistDay1: true,
-                                updated_at: moment.utc().subtract(6, 'hour').toISOString()
-                            }
-                        });
-                    } else if (dnow.isSame(registerDay2)) {
-                        await db.jrn_evento.update({
-                            where: {
-                                id: event.id
-                            },
-                            data: {
-                                isAssistDay2: true,
-                                updated_at: moment.utc().subtract(6, 'hour').toISOString()
-                            }
-                        });
-                    } else if (dnow.isSame(registerDay3)) {
-                        await db.jrn_evento.update({
-                            where: {
-                                id: event.id
-                            },
-                            data: {
-                                isAssistDay3: true,
-                                updated_at: moment.utc().subtract(6, 'hour').toISOString()
-                            }
-                        });
+                    correo: assistant,
+                    created_at: {
+                        gte: moment_timezone_1.default.utc(currentYear).toISOString(),
+                        lt: moment_timezone_1.default.utc(nextYear).toISOString()
                     }
-                } else {
-                    resolve({ ok: false, typeError: 3 });
+                },
+                select: {
+                    id: true
                 }
-
-                resolve(true);
-            } else {
-                resolve({ ok: false, typeError: 1 });
-            } */
-            resolve(true);
+            });
+            if (!isRegistered) { //if isn't registered
+                return resolve({ ok: false, typeError: 1 });
+            }
+            const edition = yield db_1.db.jrn_edicion.findFirst({
+                where: {
+                    edicion: currentYear
+                },
+                select: {
+                    fec_dia_1: true,
+                    fec_dia_2: true,
+                    fec_dia_3: true,
+                    gratuito: true
+                }
+            });
+            const dnow = (0, moment_timezone_1.default)();
+            if (dnow.isBefore(edition === null || edition === void 0 ? void 0 : edition.fec_dia_1)) { // if assistance is checked before event begins
+                return resolve({ ok: false, typeError: 2 });
+            }
+            const isOnCongress = yield db_1.db.jrn_inscritos_modulos.findFirst({
+                where: {
+                    jrn_persona: { correo: assistant }
+                },
+                select: {
+                    pagado: true
+                }
+            });
+            if (!isOnCongress) { //if isn't registered on congress
+                return resolve({ ok: false, typeError: 3 });
+            }
+            if (!(edition === null || edition === void 0 ? void 0 : edition.gratuito)) { //if edition isn't free, attendance payment tracking
+                if ((isOnCongress === null || isOnCongress === void 0 ? void 0 : isOnCongress.pagado) === 0) { //if hasn't paid yet or has scholarship
+                    return resolve({ ok: false, typeError: 4 });
+                }
+            }
+            yield db_1.db.jrn_inscritos_modulos.updateMany({
+                where: {
+                    id_persona: isRegistered.id
+                },
+                data: Object.assign(Object.assign(Object.assign(Object.assign({}, (dnow.isSameOrAfter(edition === null || edition === void 0 ? void 0 : edition.fec_dia_1) && dnow.isBefore(edition === null || edition === void 0 ? void 0 : edition.fec_dia_2)) && {
+                    asistioDia1: true
+                }), (dnow.isSameOrAfter(edition === null || edition === void 0 ? void 0 : edition.fec_dia_2) && dnow.isBefore(edition === null || edition === void 0 ? void 0 : edition.fec_dia_3)) && {
+                    asistioDia2: true
+                }), (dnow.isSameOrAfter(edition === null || edition === void 0 ? void 0 : edition.fec_dia_3)) && {
+                    asistioDia3: true
+                }), { updated_at: moment_timezone_1.default.utc().subtract(6, 'hour').toISOString() })
+            });
+            resolve({ ok: true, typeError: 0 });
         }
         catch (error) {
             reject(error);
@@ -280,62 +289,92 @@ const updateAttendancesQuery = (assistant) => {
     }));
 };
 exports.updateAttendancesQuery = updateAttendancesQuery;
-//!IMPORTANT UPDATE EVERY YEAR
 const updateAttendancesWorkshopsQuery = (assistant) => {
     return new Promise((resolve, reject) => __awaiter(void 0, void 0, void 0, function* () {
         try {
-            /* const dateT1 = moment(`${moment().format('YYYY')}-11-22 08:00:00`);
-            const dateT2 = moment(`${moment().format('YYYY')}-11-22 15:30:00`);
-            const dateT3 = moment(`${moment().format('YYYY')}-12-20`);
-            const dateT4 = moment(`${moment().format('YYYY')}-12-20`);
-            const dnowWorkshops = moment();
-
-            if (dnowWorkshops.isBefore(dateT1)) {// if assistance is checked before event begins
-                return resolve({ ok: false, typeError: 2 });
-            }
-
-            const splittedData: string[] = assistant.assistant.split('|');
-
-            const event = await db.jrn_evento.findFirst({
+            const currentYear = (0, moment_timezone_1.default)().format('YYYY');
+            const nextYear = (parseInt(currentYear) + 1).toString();
+            const isRegistered = yield db_1.db.jrn_persona.findFirst({
                 where: {
-                    jrn_persona: { correo: splittedData[0] },
-                    OR: [
-                        { isRegisteredT1: true },
-                        { isRegisteredT2: true }
-                    ]
+                    correo: assistant,
+                    created_at: {
+                        gte: moment_timezone_1.default.utc(currentYear).toISOString(),
+                        lt: moment_timezone_1.default.utc(nextYear).toISOString()
+                    }
+                },
+                select: {
+                    id: true
                 }
             });
-
-            if (event) {
-                if (event.isRegisteredT1 && (dnowWorkshops.isSameOrAfter(dateT1) && dnowWorkshops.isSameOrBefore(dateT2))) {
-                    await db.jrn_evento.update({
+            if (!isRegistered) { //if isn't registered
+                return resolve({ ok: false, typeError: 1 });
+            }
+            const edition = yield db_1.db.jrn_edicion.findFirst({
+                where: {
+                    edicion: currentYear
+                },
+                select: {
+                    fec_dia_1: true,
+                    fec_dia_2: true,
+                    fec_dia_3: true
+                }
+            });
+            const dnow = (0, moment_timezone_1.default)();
+            if (dnow.isBefore(edition === null || edition === void 0 ? void 0 : edition.fec_dia_1)) { // if assistance is checked before event begins
+                return resolve({ ok: false, typeError: 2 });
+            }
+            const isOnWorkshops = yield db_1.db.jrn_inscritos_talleres.findMany({
+                where: {
+                    id_persona: isRegistered.id
+                },
+                select: {
+                    jrn_taller: {
+                        select: {
+                            id: true,
+                            nombre: true,
+                            fecha: true,
+                            hora_inicio: true,
+                            hora_fin: true
+                        }
+                    }
+                }
+            });
+            if (isOnWorkshops.length === 0) { //if isn't registered on workshops
+                return resolve({ ok: false, typeError: 3 });
+            }
+            let assistance = [];
+            //validate this part
+            for (const workshop of isOnWorkshops) {
+                const dnow2 = (0, moment_timezone_1.default)();
+                const workshopDate = moment_timezone_1.default.utc(workshop.jrn_taller.fecha).format('YYYY-MM-DD').split('-');
+                if (dnow2.utc().subtract(6, 'hour').isSameOrAfter(moment_timezone_1.default.utc(workshop.jrn_taller.hora_inicio).subtract(1, 'hour').set({
+                    year: parseInt(workshopDate[0]),
+                    month: parseInt(workshopDate[1]) - 1,
+                    date: parseInt(workshopDate[2]),
+                })) && dnow2.utc().subtract(6, 'hour').isSameOrBefore(moment_timezone_1.default.utc(workshop.jrn_taller.hora_fin).add(1, 'hour').set({
+                    year: parseInt(workshopDate[0]),
+                    month: parseInt(workshopDate[1]) - 1,
+                    date: parseInt(workshopDate[2]),
+                }))) {
+                    const res = yield db_1.db.jrn_inscritos_talleres.updateMany({
                         where: {
-                            id: event.id
+                            id_persona: isRegistered.id,
+                            id_taller: workshop.jrn_taller.id
                         },
                         data: {
-                            isAssistT1: true,
-                            updated_at: moment.utc().subtract(6, 'hour').toISOString()
+                            asistio: true,
+                            updated_at: moment_timezone_1.default.utc().subtract(6, 'hour').toISOString()
                         }
                     });
+                    assistance.push(res);
                 }
-
-                if (event.isRegisteredT2 && dnowWorkshops.isSameOrAfter(dateT2)) {
-                    await db.jrn_evento.update({
-                        where: {
-                            id: event.id
-                        },
-                        data: {
-                            isAssistT2: true,
-                            updated_at: moment.utc().subtract(6, 'hour').toISOString()
-                        }
-                    });
-                }
-
-                resolve(event);
-            } else {
-                resolve({ ok: false, typeError: 1 });
-            } */
-            resolve(true);
+            }
+            if (assistance.length === 0) {
+                return resolve({ ok: false, typeError: 2 });
+            }
+            else {
+                return resolve(true);
+            }
         }
         catch (error) {
             reject(error);
@@ -343,3 +382,29 @@ const updateAttendancesWorkshopsQuery = (assistant) => {
     }));
 };
 exports.updateAttendancesWorkshopsQuery = updateAttendancesWorkshopsQuery;
+const updatePaymentStatusQuery = (isPayed, id_persona) => {
+    return new Promise((resolve, reject) => __awaiter(void 0, void 0, void 0, function* () {
+        try {
+            const paymentStatus = yield db_1.db.jrn_inscritos_modulos.updateMany({
+                where: {
+                    jrn_persona: {
+                        id: id_persona
+                    }
+                },
+                data: {
+                    pagado: isPayed
+                }
+            });
+            if (paymentStatus.count === 0) {
+                resolve(false);
+            }
+            else {
+                resolve(true);
+            }
+        }
+        catch (error) {
+            reject(error);
+        }
+    }));
+};
+exports.updatePaymentStatusQuery = updatePaymentStatusQuery;

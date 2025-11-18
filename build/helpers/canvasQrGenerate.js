@@ -22,30 +22,32 @@ const generateQr = (data, rutaLogo) => __awaiter(void 0, void 0, void 0, functio
     const qrCanvas = (0, canvas_1.createCanvas)(250, 250); // Qr code size
     const ctx = qrCanvas.getContext('2d');
     //generate Qr code content
-    const content = `${data.correo}|`;
+    const talleres = data.talleres.map(taller => taller.id_taller).join(',');
+    const content = `${data.correo}|${data.modulo === null || data.modulo === 0 ? '' : data.modulo}|${data.talleres.length !== 0 ? talleres : ''}|`;
     // Generate Qr code as image
-    const qrImage = yield qrcode_1.default.toBuffer(content, { width: 250, margin: 1 });
+    const qrImage = yield qrcode_1.default.toBuffer(content, {
+        width: 250,
+        margin: 1,
+        errorCorrectionLevel: 'H'
+    });
     const qrImg = yield (0, canvas_1.loadImage)(qrImage);
     // Draw qr code in canvas
     ctx.drawImage(qrImg, 0, 0, 250, 250);
-    /* // load logo
-    const logo = await loadImage(rutaLogo);
-    const logoSize: number = 65;
-    const logoX: number = (qrCanvas.width - logoSize) / 2;
-    const logoY: number = (qrCanvas.height - logoSize) / 2;
-
+    // load logo
+    const logo = yield (0, canvas_1.loadImage)(rutaLogo);
+    const logoSize = 55;
+    const logoX = (qrCanvas.width - logoSize) / 2;
+    const logoY = (qrCanvas.height - logoSize) / 2;
     ctx.save();
     ctx.fillStyle = "white"; // circle color
-
     // Draw circle
     ctx.beginPath();
-    ctx.arc(125, 125, 35, 0, Math.PI * 2, true);
+    ctx.arc(125, 125, 32, 0, Math.PI * 2, true);
     ctx.fill();
     ctx.restore();
-
     // Draw logo at middle of qr code
     ctx.drawImage(logo, logoX, logoY, logoSize, logoSize);
-    ctx.restore(); */
+    ctx.restore();
     // Save final qr code as image
     const rutaQr = path_1.default.join(__dirname, `../../public/${data.correo}.png`);
     const buffer = qrCanvas.toBuffer('image/png');
