@@ -252,9 +252,16 @@ export const updateAttendancesQuery = (assistant: string) => {
 
             const isOnCongress = await db.jrn_inscritos_modulos.findFirst({
                 where: {
-                    jrn_persona: { correo: assistant }
+                    jrn_persona: {
+                        correo: assistant,
+                        created_at: {
+                            gte: moment.utc(currentYear).toISOString(),
+                            lt: moment.utc(nextYear).toISOString()
+                        }
+                    }
                 },
                 select: {
+                    id: true,
                     pagado: true
                 }
             });
