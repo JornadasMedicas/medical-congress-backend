@@ -300,7 +300,7 @@ export const printPdfVoucher = async (req: any, res: Response) => { //func para 
 
         params = {
             ...params,
-            folio: lastFolium,
+            folio: lastFolium.toString().padStart(3, '0'),
             current_day: moment.utc().format('DD')
         }
 
