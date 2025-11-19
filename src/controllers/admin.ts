@@ -270,7 +270,7 @@ export const updatePaymentStatus = async (req: any, res: Response) => {
 export const printPdfVoucher = async (req: any, res: Response) => { //func para generar voucher de pago
     try {
         let params: any = req.query;
-        let lastFolium = 0;
+        let lastFolium = 1;
 
         const hasFolium = await getSingleVoucherFolium(parseInt(params.id));
 
@@ -280,11 +280,21 @@ export const printPdfVoucher = async (req: any, res: Response) => { //func para 
             const foliums = await getVoucherFoliums(); //obtiene todos los folios si hay
             if (foliums.length === 0) { //si no hay folios asignados aún
                 const res = await setVoucherFolium(hasFolium.id, lastFolium);
-                lastFolium = res.folio_voucher != null ? res.folio_voucher : 0; 
+                lastFolium = res.folio_voucher != null ? res.folio_voucher : 1;
             } else {
-                lastFolium = foliums[0].folio_voucher != null ? foliums[0].folio_voucher : 0; 
-                const res = await setVoucherFolium(hasFolium.id, lastFolium);
-                lastFolium = res.folio_voucher != null ? res.folio_voucher : 0; 
+                let isNotAvailable = true;
+
+                while (isNotAvailable) {
+                    let nextFolium = foliums.find((item) => lastFolium === item.folio_voucher);
+                    
+                    if (!nextFolium) {
+                        const res = await setVoucherFolium(hasFolium.id, lastFolium);
+                        lastFolium = res.folio_voucher != null ? res.folio_voucher : 1;
+                        isNotAvailable = false;
+                    } else {
+                        lastFolium += 1;
+                    }
+                }
             }
         }
 

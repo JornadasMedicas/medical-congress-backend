@@ -418,6 +418,9 @@ export const updatePaymentStatusQuery = (isPayed: number, id_persona: number) =>
                     }
                 },
                 data: {
+                    ...(isPayed === 0 || isPayed === 2) && {
+                        folio_voucher: null
+                    },
                     pagado: isPayed
                 }
             });
@@ -494,7 +497,7 @@ export const setVoucherFolium = (id: number, currentFolium: number): Promise<{ i
                     id
                 },
                 data: {
-                    folio_voucher: currentFolium + 1
+                    folio_voucher: currentFolium
                 },
                 select: {
                     folio_voucher: true
