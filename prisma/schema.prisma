@@ -108,6 +108,7 @@ model jrn_inscritos_modulos {
     asistioDia2           Boolean   @default(false) @db.TinyInt()
     asistioDia3           Boolean   @default(false) @db.TinyInt()
     pagado                Int       @default(0) @db.TinyInt()
+    razon_beca            String?   @db.VarChar(50)
     folio_voucher         Int?      @db.UnsignedInt
     hoja                  Int?      @db.UnsignedInt
     folio                 Int?      @db.UnsignedInt

@@ -418,7 +418,14 @@ export const updatePaymentStatusQuery = (isPayed: number, id_persona: number) =>
                     }
                 },
                 data: {
-                    ...(isPayed === 0 || isPayed === 2) && {
+                    ...(isPayed === 0) && {
+                        folio_voucher: null,
+                        razon_beca: null
+                    },
+                    ...(isPayed === 1) && {
+                        razon_beca: null
+                    },
+                    ...(isPayed === 2) && {
                         folio_voucher: null
                     },
                     pagado: isPayed
@@ -505,6 +512,50 @@ export const setVoucherFolium = (id: number, currentFolium: number): Promise<{ i
             });
 
             resolve(folium);
+        } catch (error) {
+            reject(error);
+        }
+    })
+}
+
+export const getReasonQuery = (id: number) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            let res = await db.jrn_inscritos_modulos.findFirst({
+                where: {
+                    jrn_persona: {
+                        id
+                    }
+                },
+                select: {
+                    id: true,
+                    razon_beca: true
+                }
+            });
+
+            resolve(res);
+        } catch (error) {
+            reject(error);
+        }
+    })
+}
+
+export const updateReasonQuery = ({ ...props }: { id: number, razon: string }) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            let res = await db.jrn_inscritos_modulos.updateMany({
+                where: {
+                    jrn_persona: {
+                        id: props.id
+                    }
+                },
+                data: {
+                    razon_beca: props.razon.toUpperCase(),
+                    updated_at: moment.utc().subtract(6, 'hour').toISOString()
+                }
+            });
+
+            resolve(res);
         } catch (error) {
             reject(error);
         }

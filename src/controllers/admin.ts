@@ -286,7 +286,7 @@ export const printPdfVoucher = async (req: any, res: Response) => { //func para 
 
                 while (isNotAvailable) {
                     let nextFolium = foliums.find((item) => lastFolium === item.folio_voucher);
-                    
+
                     if (!nextFolium) {
                         const res = await setVoucherFolium(hasFolium.id, lastFolium);
                         lastFolium = res.folio_voucher != null ? res.folio_voucher : 1;

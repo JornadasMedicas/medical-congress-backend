@@ -1,5 +1,5 @@
 import { Response } from "express";
-import { getAssistantInfoQuery, getAssistantsAutocompleteQuery, getAssistantsQuery, getCountAssistantsQuery, updateAttendancesQuery, updateAttendancesWorkshopsQuery } from "../helpers/assistantsQueries";
+import { getAssistantInfoQuery, getAssistantsAutocompleteQuery, getAssistantsQuery, getCountAssistantsQuery, getReasonQuery, updateAttendancesQuery, updateAttendancesWorkshopsQuery, updateReasonQuery } from "../helpers/assistantsQueries";
 import { PropsGetAssistantsQueries, PropsGetTotalAssistantsQueries } from "../interfaces/IAssistants";
 
 export const getAssistants = async (req: any, res: Response) => {
@@ -159,6 +159,51 @@ export const updateAttendancesWorkshops = async (req: any, res: Response) => {
         res.status(500).json({
             ok: false,
             msg: 'No se ha podido procesar la solicitud.'
+        });
+    }
+}
+
+export const getReason = async (req: any, res: Response) => {
+    try {
+        let { id } = req.params;
+        
+        const reason = await getReasonQuery(parseInt(id));
+
+        if (reason) {
+            res.status(200).json(reason);
+        } else {
+            res.status(500).json({
+                ok: false,
+                msg: 'Server error contact the administrator'
+            });
+        }
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            ok: false,
+            msg: 'Server error contact the administrator'
+        });
+    }
+}
+
+export const updateReason = async (req: any, res: Response) => {
+    try {
+        const { id, razon } = req.body;
+        const reasonUpdate = await updateReasonQuery({ id, razon });
+
+        if (reasonUpdate) {
+            res.status(200).json(reasonUpdate);
+        } else {
+            res.status(500).json({
+                ok: false,
+                msg: 'Server error contact the administrator'
+            });
+        }
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            ok: false,
+            msg: 'Server error contact the administrator'
         });
     }
 }
