@@ -423,10 +423,10 @@ export const updatePaymentStatusQuery = (isPayed: number, id_persona: number) =>
                         razon_beca: null
                     },
                     ...(isPayed === 1) && {
-                        razon_beca: null
+                        folio_voucher: null
                     },
                     ...(isPayed === 2) && {
-                        folio_voucher: null
+                        razon_beca: null
                     },
                     pagado: isPayed
                 }
