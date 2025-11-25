@@ -19,6 +19,7 @@ const playwright_1 = require("playwright");
 const string_template_1 = __importDefault(require("string-template"));
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
+const moment_1 = __importDefault(require("moment"));
 const getCountCatalogs = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         let countCatalogs = yield (0, adminQueries_1.getCountCatalogsQuery)();
@@ -286,8 +287,34 @@ const updatePaymentStatus = (req, res) => __awaiter(void 0, void 0, void 0, func
 exports.updatePaymentStatus = updatePaymentStatus;
 const printPdfVoucher = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        //get params from front-end
-        const params = req.query;
+        let params = req.query;
+        let lastFolium = 1;
+        const hasFolium = yield (0, assistantsQueries_1.getSingleVoucherFolium)(parseInt(params.id));
+        if (hasFolium.folio_voucher) { //si ya tiene un folio asignado se vuelve a imprimir con su folio
+            lastFolium = hasFolium.folio_voucher;
+        }
+        else { //si no
+            const foliums = yield (0, assistantsQueries_1.getVoucherFoliums)(); //obtiene todos los folios si hay
+            if (foliums.length === 0) { //si no hay folios asignados aún
+                const res = yield (0, assistantsQueries_1.setVoucherFolium)(hasFolium.id, lastFolium);
+                lastFolium = res.folio_voucher != null ? res.folio_voucher : 1;
+            }
+            else {
+                let isNotAvailable = true;
+                while (isNotAvailable) {
+                    let nextFolium = foliums.find((item) => lastFolium === item.folio_voucher);
+                    if (!nextFolium) {
+                        const res = yield (0, assistantsQueries_1.setVoucherFolium)(hasFolium.id, lastFolium);
+                        lastFolium = res.folio_voucher != null ? res.folio_voucher : 1;
+                        isNotAvailable = false;
+                    }
+                    else {
+                        lastFolium += 1;
+                    }
+                }
+            }
+        }
+        params = Object.assign(Object.assign({}, params), { folio: lastFolium.toString().padStart(3, '0'), current_day: moment_1.default.utc().format('DD') });
         const templatePath = path_1.default.join(__dirname, "../templates/voucherPagoEfectivo.html");
         const html = fs_1.default.readFileSync(templatePath, "utf8");
         const template = (0, string_template_1.default)(html, params);

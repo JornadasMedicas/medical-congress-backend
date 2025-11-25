@@ -23,7 +23,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updatePaymentStatusQuery = exports.updateAttendancesWorkshopsQuery = exports.updateAttendancesQuery = exports.getCountAssistantsQuery = exports.getAssistantsAutocompleteQuery = exports.getAssistantInfoQuery = exports.getAssistantsQuery = void 0;
+exports.updateReasonQuery = exports.getReasonQuery = exports.setVoucherFolium = exports.getSingleVoucherFolium = exports.getVoucherFoliums = exports.updatePaymentStatusQuery = exports.updateAttendancesWorkshopsQuery = exports.updateAttendancesQuery = exports.getCountAssistantsQuery = exports.getAssistantsAutocompleteQuery = exports.getAssistantInfoQuery = exports.getAssistantsQuery = void 0;
 const moment_timezone_1 = __importDefault(require("moment-timezone"));
 const db_1 = require("../utils/db");
 moment_timezone_1.default.tz.setDefault('America/Mexico_City');
@@ -255,9 +255,16 @@ const updateAttendancesQuery = (assistant) => {
             }
             const isOnCongress = yield db_1.db.jrn_inscritos_modulos.findFirst({
                 where: {
-                    jrn_persona: { correo: assistant }
+                    jrn_persona: {
+                        correo: assistant,
+                        created_at: {
+                            gte: moment_timezone_1.default.utc(currentYear).toISOString(),
+                            lt: moment_timezone_1.default.utc(nextYear).toISOString()
+                        }
+                    }
                 },
                 select: {
+                    id: true,
                     pagado: true
                 }
             });
@@ -391,9 +398,14 @@ const updatePaymentStatusQuery = (isPayed, id_persona) => {
                         id: id_persona
                     }
                 },
-                data: {
-                    pagado: isPayed
-                }
+                data: Object.assign(Object.assign(Object.assign(Object.assign({}, (isPayed === 0) && {
+                    folio_voucher: null,
+                    razon_beca: null
+                }), (isPayed === 1) && {
+                    folio_voucher: null
+                }), (isPayed === 2) && {
+                    razon_beca: null
+                }), { pagado: isPayed })
             });
             if (paymentStatus.count === 0) {
                 resolve(false);
@@ -408,3 +420,121 @@ const updatePaymentStatusQuery = (isPayed, id_persona) => {
     }));
 };
 exports.updatePaymentStatusQuery = updatePaymentStatusQuery;
+const getVoucherFoliums = () => {
+    return new Promise((resolve, reject) => __awaiter(void 0, void 0, void 0, function* () {
+        try {
+            const currentYear = (0, moment_timezone_1.default)().format('YYYY');
+            const nextYear = (parseInt(currentYear) + 1).toString();
+            const foliums = yield db_1.db.jrn_inscritos_modulos.findMany({
+                where: {
+                    jrn_persona: {
+                        created_at: {
+                            gte: moment_timezone_1.default.utc(currentYear).toISOString(),
+                            lt: moment_timezone_1.default.utc(nextYear).toISOString()
+                        }
+                    },
+                    folio_voucher: { not: null }
+                },
+                select: {
+                    id: true,
+                    folio_voucher: true
+                },
+                orderBy: { folio_voucher: 'desc' }
+            });
+            resolve(foliums);
+        }
+        catch (error) {
+            reject(error);
+        }
+    }));
+};
+exports.getVoucherFoliums = getVoucherFoliums;
+const getSingleVoucherFolium = (id) => {
+    return new Promise((resolve, reject) => __awaiter(void 0, void 0, void 0, function* () {
+        try {
+            const folium = yield db_1.db.jrn_inscritos_modulos.findFirst({
+                where: {
+                    jrn_persona: {
+                        id
+                    }
+                },
+                select: {
+                    id: true,
+                    folio_voucher: true
+                }
+            });
+            resolve(folium);
+        }
+        catch (error) {
+            reject(error);
+        }
+    }));
+};
+exports.getSingleVoucherFolium = getSingleVoucherFolium;
+const setVoucherFolium = (id, currentFolium) => {
+    return new Promise((resolve, reject) => __awaiter(void 0, void 0, void 0, function* () {
+        try {
+            const folium = yield db_1.db.jrn_inscritos_modulos.update({
+                where: {
+                    id
+                },
+                data: {
+                    folio_voucher: currentFolium
+                },
+                select: {
+                    folio_voucher: true
+                }
+            });
+            resolve(folium);
+        }
+        catch (error) {
+            reject(error);
+        }
+    }));
+};
+exports.setVoucherFolium = setVoucherFolium;
+const getReasonQuery = (id) => {
+    return new Promise((resolve, reject) => __awaiter(void 0, void 0, void 0, function* () {
+        try {
+            let res = yield db_1.db.jrn_inscritos_modulos.findFirst({
+                where: {
+                    jrn_persona: {
+                        id
+                    }
+                },
+                select: {
+                    id: true,
+                    razon_beca: true
+                }
+            });
+            resolve(res);
+        }
+        catch (error) {
+            reject(error);
+        }
+    }));
+};
+exports.getReasonQuery = getReasonQuery;
+const updateReasonQuery = (_a) => {
+    var props = __rest(_a, []);
+    return new Promise((resolve, reject) => __awaiter(void 0, void 0, void 0, function* () {
+        try {
+            let res = yield db_1.db.jrn_inscritos_modulos.updateMany({
+                where: {
+                    jrn_persona: {
+                        id: props.id
+                    }
+                },
+                data: {
+                    razon_beca: props.razon.toUpperCase(),
+                    updated_at: moment_timezone_1.default.utc().subtract(6, 'hour').toISOString()
+                }
+            });
+            resolve(res);
+        }
+        catch (error) {
+            reject(error);
+        }
+    }));
+};
+exports.updateReasonQuery = updateReasonQuery;

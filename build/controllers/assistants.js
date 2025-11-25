@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateAttendancesWorkshops = exports.updateAttendances = exports.getTotalAssistants = exports.getAssistantsAutocomplete = exports.getAssistantInfo = exports.getAssistants = void 0;
+exports.updateReason = exports.getReason = exports.updateAttendancesWorkshops = exports.updateAttendances = exports.getTotalAssistants = exports.getAssistantsAutocomplete = exports.getAssistantInfo = exports.getAssistants = void 0;
 const assistantsQueries_1 = require("../helpers/assistantsQueries");
 const getAssistants = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -179,3 +179,49 @@ const updateAttendancesWorkshops = (req, res) => __awaiter(void 0, void 0, void 
     }
 });
 exports.updateAttendancesWorkshops = updateAttendancesWorkshops;
+const getReason = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        let { id } = req.params;
+        const reason = yield (0, assistantsQueries_1.getReasonQuery)(parseInt(id));
+        if (reason) {
+            res.status(200).json(reason);
+        }
+        else {
+            res.status(500).json({
+                ok: false,
+                msg: 'Server error contact the administrator'
+            });
+        }
+    }
+    catch (error) {
+        console.log(error);
+        res.status(500).json({
+            ok: false,
+            msg: 'Server error contact the administrator'
+        });
+    }
+});
+exports.getReason = getReason;
+const updateReason = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { id, razon } = req.body;
+        const reasonUpdate = yield (0, assistantsQueries_1.updateReasonQuery)({ id, razon });
+        if (reasonUpdate) {
+            res.status(200).json(reasonUpdate);
+        }
+        else {
+            res.status(500).json({
+                ok: false,
+                msg: 'Server error contact the administrator'
+            });
+        }
+    }
+    catch (error) {
+        console.log(error);
+        res.status(500).json({
+            ok: false,
+            msg: 'Server error contact the administrator'
+        });
+    }
+});
+exports.updateReason = updateReason;
