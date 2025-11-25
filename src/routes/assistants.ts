@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { getAssistantInfo, getAssistants, getAssistantsAutocomplete, getReason, getTotalAssistants, updateAttendances, updateAttendancesWorkshops, updateReason } from "../controllers/assistants";
+import { getAssistantInfo, getAssistants, getAssistantsAutocomplete, getReason, getTotalAssistants, updateAttendances, updateAttendancesWorkshops, updateCancelReason, updateReason } from "../controllers/assistants";
 import { updatePaymentStatus } from "../controllers/admin";
 
 const router: Router = Router();
@@ -14,5 +14,6 @@ router.put('/attendance', updateAttendances);
 router.put('/attendanceWorkshops', updateAttendancesWorkshops);
 router.put('/updatePaymentStatus', updatePaymentStatus);
 router.put('/updateReason', updateReason);
+router.put('/updateCancelReason', updateCancelReason);
 
 export default router;

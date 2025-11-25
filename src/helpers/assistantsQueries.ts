@@ -423,7 +423,8 @@ export const updatePaymentStatusQuery = (isPayed: number, id_persona: number) =>
                         razon_beca: null
                     },
                     ...(isPayed === 1) && {
-                        folio_voucher: null
+                        folio_voucher: null,
+                        razon_cancelado: null
                     },
                     ...(isPayed === 2) && {
                         razon_beca: null
@@ -551,6 +552,28 @@ export const updateReasonQuery = ({ ...props }: { id: number, razon: string }) =
                 },
                 data: {
                     razon_beca: props.razon.toUpperCase(),
+                    updated_at: moment.utc().subtract(6, 'hour').toISOString()
+                }
+            });
+
+            resolve(res);
+        } catch (error) {
+            reject(error);
+        }
+    })
+}
+
+export const updateCancelReasonQuery = ({ ...props }: { id: number, razon: string }) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            let res = await db.jrn_inscritos_modulos.updateMany({
+                where: {
+                    jrn_persona: {
+                        id: props.id
+                    }
+                },
+                data: {
+                    razon_cancelado: props.razon.toUpperCase(),
                     updated_at: moment.utc().subtract(6, 'hour').toISOString()
                 }
             });
