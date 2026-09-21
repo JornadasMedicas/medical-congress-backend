@@ -9,31 +9,31 @@ import routeRegist from '../routes/register';
 import routeAssistants from '../routes/assistants';
 import routeAdmin from '../routes/admin';
 import fs from 'fs';
-import { Socket } from 'socket.io';
+import { Server as SocketIOServer } from 'socket.io';
 import Sockets from './sockets';
 
 class Server {
     private app: Express;
     private port: number;
     private server: HttpServer;
-    private io: Socket;
+    private io: SocketIOServer;
     private sockets: Sockets;
 
     constructor() {
 
         //express server
         this.app = express();
-        this.port = parseInt( `${ process.env.PORT }` );
-        this.server = require('http').createServer(this.app);
-        
+        this.port = parseInt(`${process.env.PORT}`);
+        this.server = http.createServer(this.app);
+
         //initialize sockets
-        this.io = require('socket.io')(this.server, {
-            cors: { //only enable cors if clients will connect from remote domains or ports besides 'origin'
+        this.io = new SocketIOServer(this.server, {
+            cors: {
                 origin: '*',
                 methods: ['GET', 'POST']
             }
         });
-        
+
         this.sockets = new Sockets(this.io);
     }
 
