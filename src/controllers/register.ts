@@ -82,7 +82,7 @@ export const sendRegistMail = async (req: any, res: any) => {
                         const costo: string = data.categoria.includes('Estudiante') ? '200' : response.jrn_inscritos_modulos[0].jrn_modulo.costo;
                         htmlTemplate = htmlTemplate.replace(/{{costo}}/g, costo);
                     } else {
-                        htmlTemplate = fs.readFileSync(path.join(__dirname, '../templates', 'emailRegistroSinCosto.html'), 'utf8');
+                        htmlTemplate = fs.readFileSync(path.join(__dirname, '../templates', 'emailRegistroNoCosto.html'), 'utf8');
                     }
 
                     htmlTemplate = htmlTemplate.replace(/{{acronimo}}/g, data.acronimo.trim());
