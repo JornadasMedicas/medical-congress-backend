@@ -53,7 +53,12 @@ export const createInsertionQuery = ({ ...props }: PropsSendRegistMailInterface,
                         ...(props.talleres.length > 0 && {
                             jrn_inscritos_talleres: {
                                 createMany: {
-                                    data: props.talleres
+                                    data: props.talleres.map(taller => ({
+                                        asistio: false,
+                                        constancia_enviada: false,
+                                        id_taller: taller.id_taller,
+                                        created_at: moment.utc().subtract(6, 'hour').toISOString(),
+                                    })),
                                 }
                             }
                         })

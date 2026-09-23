@@ -1,12 +1,12 @@
-import { Socket } from "socket.io";
+import { Socket, Server } from "socket.io";
 import { getModulesQuery, getWorkshopsQuery } from "../helpers/adminQueries";
 import { PropsSendRegistMailInterface } from "../interfaces/IRegister";
 import { updateModuleCounter, updateWorkshopsCounter } from "../helpers/registerQueries";
 
 class Sockets {
-    io: Socket;
+    io: Server;
 
-    constructor(io: Socket) {
+    constructor(io: Server) {
         this.io = io;
 
         this.socketEvents();

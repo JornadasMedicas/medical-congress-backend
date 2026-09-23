@@ -82,7 +82,7 @@ export const sendRegistMail = async (req: any, res: any) => {
                         const costo: string = data.categoria.includes('Estudiante') ? '200' : response.jrn_inscritos_modulos[0].jrn_modulo.costo;
                         htmlTemplate = htmlTemplate.replace(/{{costo}}/g, costo);
                     } else {
-                        htmlTemplate = fs.readFileSync(path.join(__dirname, '../templates', 'emailRegistroSinCosto.html'), 'utf8');
+                        htmlTemplate = fs.readFileSync(path.join(__dirname, '../templates', 'emailRegistroNoCosto.html'), 'utf8');
                     }
 
                     htmlTemplate = htmlTemplate.replace(/{{acronimo}}/g, data.acronimo.trim());
@@ -90,6 +90,7 @@ export const sendRegistMail = async (req: any, res: any) => {
                     htmlTemplate = htmlTemplate.replace(/{{apellido}}/g, data.apellidos.trim());
                     htmlTemplate = htmlTemplate.replace(/{{aniversario}}/g, (parseInt(moment.utc().format('YYYY')) - 1989).toString());
                     htmlTemplate = htmlTemplate.replace(/{{modulo}}/g, response.jrn_inscritos_modulos[0].jrn_modulo.nombre);
+                    htmlTemplate = htmlTemplate.replace(/{{talleres}}/g, data.talleres.length > 0 ? `<p style="font-weight: bold; font-size:16px;">Talleres Seleccionados: <span style="font-weight: 100;">${data.talleres.map(taller => taller.nombre).join(', ')}</span></p>` : '');
 
                     const info: SMTPTransport.SentMessageInfo = await transporter.sendMail({
                         from: `"Centro de Alta Especialidad Dr. Rafael Lucio" <${email[0].user}>`, // sender address
