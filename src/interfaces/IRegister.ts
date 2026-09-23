@@ -7,6 +7,7 @@ export interface PropsTalleresInterface {
     asistio: boolean;
     constancia_enviada: boolean;
     id_taller: number;
+    nombre?: string;
 }
 
 export interface PropsSendRegistMailInterface {
