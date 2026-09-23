@@ -90,6 +90,7 @@ export const sendRegistMail = async (req: any, res: any) => {
                     htmlTemplate = htmlTemplate.replace(/{{apellido}}/g, data.apellidos.trim());
                     htmlTemplate = htmlTemplate.replace(/{{aniversario}}/g, (parseInt(moment.utc().format('YYYY')) - 1989).toString());
                     htmlTemplate = htmlTemplate.replace(/{{modulo}}/g, response.jrn_inscritos_modulos[0].jrn_modulo.nombre);
+                    htmlTemplate = htmlTemplate.replace(/{{talleres}}/g, data.talleres.length > 0 ? `<p style="font-weight: bold; font-size:16px;">Talleres Seleccionados: <span style="font-weight: 100;">${data.talleres.map(taller => taller.nombre).join(', ')}</span></p>` : '');
 
                     const info: SMTPTransport.SentMessageInfo = await transporter.sendMail({
                         from: `"Centro de Alta Especialidad Dr. Rafael Lucio" <${email[0].user}>`, // sender address
