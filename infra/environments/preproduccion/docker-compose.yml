@@ -17,27 +17,6 @@ secrets:
 
 
 services:
-  front:
-    image: reddebjsh/jornadas2025:front-1.0.0
-    volumes:
-      - /etc/localtime:/etc/localtime:ro
-    ports:
-      - target: 443
-        published: 443
-      - target: 80
-        published: 80
-    networks:
-      - jornadas_network
-    secrets:
-      - source: crt_2025
-        target: /cert/server.crt
-      - source: key_2025
-        target: /cert/server.key
-    deploy:
-      replicas: 1
-    depends_on:
-      - proxy_backend
-
   proxy_backend:
     image: reddebjsh/jornadas2025:proxy-1.0.0
     volumes:
