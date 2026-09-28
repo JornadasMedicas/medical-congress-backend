@@ -1,0 +1,50 @@
+FROM node:20.6.1-bullseye-slim AS deps
+WORKDIR /app
+COPY medical-congress-backend/package.json .
+COPY medical-congress-backend/prisma/ ./prisma
+RUN npm install
+RUN npx playwright install --with-deps chromium
+RUN npx prisma generate --schema prisma/schema.prisma
+
+FROM node:20.6.1-bullseye-slim AS builder
+WORKDIR /app
+COPY medical-congress-backend/ .
+RUN npm install -g typescript
+RUN tsc || true
+
+FROM node:20.6.1-bullseye-slim AS prod
+WORKDIR /app
+
+# Install Chromium system dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libglib2.0-0 \
+    libnss3 \
+    libnspr4 \
+    libatk1.0-0 \
+    libatk-bridge2.0-0 \
+    libcups2 \
+    libdrm2 \
+    libxkbcommon0 \
+    libxcomposite1 \
+    libxdamage1 \
+    libxfixes3 \
+    libxrandr2 \
+    libgbm1 \
+    libasound2 \
+    libpango-1.0-0 \
+    libcairo2 \
+    libatspi2.0-0 \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY --chown=node .env_back .env
+COPY --chown=node --from=deps /app/prisma ./prisma
+COPY --chown=node --from=deps /app/node_modules/ ./node_modules/
+COPY --chown=node --from=deps /root/.cache/ms-playwright /home/node/.cache/ms-playwright
+COPY --chown=node --from=builder /app/public/ ./public
+COPY --chown=node --from=builder /app/build ./build/
+COPY --chown=node --from=builder /app/src/templates ./build/templates/
+
+
+EXPOSE 3000
+USER node
+CMD [ "node", "build/index.js" ]
