@@ -1,6 +1,6 @@
 include:
     project: 'gitlab/gitlab-ci-templates'
-    ref: sin_certificados_ssl
+    ref: main
     file: '/docker-build.yaml'
 
 variables:
@@ -11,10 +11,22 @@ build-app:
     extends: .build-common
     variables:
         IMAGE_NAME: $CI_REGISTRY_IMAGE/app
-        DOCKERFILE: 'infra/Dockerfile'
-        ENV_PRE: $DOT_ENV_PRE 
+        DOCKERFILE: 'infra/Dockerfile_back'
+        ENV_PRE: $DOT_ENV_PRE
         ENV_PROD: $DOT_ENV_PROD
-        ENV_FILE_TO_BUILD: '.env_api'
+        ENV_FILE_TO_BUILD: '.env_back'
+    artifacts:
+        reports:
+            dotenv: image.env
+
+build-proxy:
+    extends: .build-common
+    variables:
+        IMAGE_NAME: $CI_REGISTRY_IMAGE/proxy
+        DOCKERFILE: 'infra/Dockerfile_proxy'
+        ENV_PRE: $DOT_ENV_EMPTY
+        ENV_PROD: $DOT_ENV_EMPTY
+        ENV_FILE_TO_BUILD: '.env.proxy'
     artifacts:
         reports:
             dotenv: image.env
@@ -25,4 +37,13 @@ deploy-app-pre:
         - job: build-app
           artifacts: true
     variables:
-        SERVICE_NAME: 'back-jornadaspre_app'
+        SERVICE_NAME: 'back_jordanaspre_app'
+
+deploy-proxy-pre:
+    extends: .deploy-pre
+    needs:
+        - job: build-proxy
+          artifacts: true
+    variables:
+        SERVICE_NAME: 'back_jordanaspre_proxy'
+
