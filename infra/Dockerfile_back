@@ -1,14 +1,14 @@
 FROM node:20.6.1-bullseye-slim AS deps
 WORKDIR /app
-COPY medical-congress-backend/package.json .
-COPY medical-congress-backend/prisma/ ./prisma
+COPY package.json .
+COPY prisma/ ./prisma
 RUN npm install
 RUN npx playwright install --with-deps chromium
 RUN npx prisma generate --schema prisma/schema.prisma
 
 FROM node:20.6.1-bullseye-slim AS builder
 WORKDIR /app
-COPY medical-congress-backend/ .
+COPY . .
 RUN npm install -g typescript
 RUN tsc || true
 
