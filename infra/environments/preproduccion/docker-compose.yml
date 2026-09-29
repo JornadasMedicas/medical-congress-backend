@@ -3,7 +3,7 @@ volumes:
     driver: local
 
 networks:
-  cae_services:
+  cae-services:
     external: true
 
 services:
@@ -14,4 +14,4 @@ services:
     deploy:
       replicas: 1
     networks:
-      - cae_services
+      - cae-services
