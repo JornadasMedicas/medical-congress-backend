@@ -9,8 +9,8 @@ RUN npx prisma generate --schema prisma/schema.prisma
 FROM node:20.6.1-bullseye-slim AS builder
 WORKDIR /app
 COPY . .
-RUN npm install -g typescript
-RUN tsc || true
+COPY --from=deps /app/node_modules/ ./node_modules/
+RUN npx tsc || true
 
 FROM node:20.6.1-bullseye-slim AS prod
 WORKDIR /app
