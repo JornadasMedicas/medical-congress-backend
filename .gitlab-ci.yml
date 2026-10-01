@@ -10,11 +10,12 @@ variables:
 build-app:
     extends: .build-common
     variables:
-        IMAGE_NAME: $CI_REGISTRY_IMAGE/app
+        IMAGE_NAME: jornadas2026/jornadasmedicas
         DOCKERFILE: 'infra/Dockerfile_back'
         ENV_PRE: $DOT_ENV_PRE
         ENV_PROD: $DOT_ENV_PROD
         ENV_FILE_TO_BUILD: '.env_back'
+        IMAGE_TAG_DOCKER: 'back'
     artifacts:
         reports:
             dotenv: image.env
