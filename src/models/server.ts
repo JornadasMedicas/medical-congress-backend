@@ -1,6 +1,5 @@
 import express, { Express } from 'express';
 import { Server as HttpServer } from 'http';
-import { createServer } from 'https';
 import http from 'http';
 import cors from 'cors';
 import routerBase from '../routes/base';
@@ -8,7 +7,6 @@ import routeContact from '../routes/contact';
 import routeRegist from '../routes/register';
 import routeAssistants from '../routes/assistants';
 import routeAdmin from '../routes/admin';
-import fs from 'fs';
 import { Server as SocketIOServer } from 'socket.io';
 import Sockets from './sockets';
 
