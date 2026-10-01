@@ -1,7 +1,7 @@
 include:
     project: 'gitlab/gitlab-ci-templates'
-    ref: sin_certificados_ssl
-    file: '/docker-build.yaml'
+    ref: feature/jornadas
+    file: '/docker-build-jornadas.yaml'
 
 variables:
     DEPLOY_USER_PRE: sica118
