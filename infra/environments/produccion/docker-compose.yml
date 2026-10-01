@@ -1,68 +1,18 @@
-version: '3.8'
 volumes:
-  jornadas-mariadb-data:
-    driver: local
   jornadas-storage:
     driver: local
 
 networks:
-  jornadas_network:
-    external: true
-
-secrets:
-  key_2025:
-    external: true
-  crt_2025:
+  cae-services:
     external: true
 
 
 services:
-  proxy_backend:
-    image: reddebjsh/jornadas2025:proxy-1.0.0
-    volumes:
-      - /etc/localtime:/etc/localtime:ro
-    ports:
-      - target: 443
-        published: 3000
-    networks:
-      - jornadas_network
-    secrets:
-      - source: crt_2025
-        target: /cert/server.crt
-      - source: key_2025
-        target: /cert/server.key
-    deploy:
-      replicas: 1
-    depends_on:
-      - backend
-
   backend:
-    image: reddebjsh/jornadas2025:back-1.0.0
+    image: jornadas2026/jornadasmedicas:back
     volumes:
       - /etc/localtime:/etc/localtime:ro
     deploy:
       replicas: 1
     networks:
-      - jornadas_network
-    depends_on:
-      - database
-
-  db:
-    image: mariadb:11.3
-    
-    environment:
-      MARIADB_ROOT_PASSWORD: 6CP4ALD6Sutj
-      MARIADB_DATABASE: jornadas_medicas
-    ports:
-      - target: 3306
-        published: 3306
-    networks:
-      - jornadas_network
-    volumes:
-      - jornadas-mariadb-data:/var/lib/mysql
-      - /etc/localtime:/etc/localtime:ro
-    deploy:
-      replicas: 1
-      placement: 
-        constraints: 
-          - node.role == manager
+      - cae-services
