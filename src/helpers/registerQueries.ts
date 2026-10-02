@@ -148,6 +148,33 @@ export const getEmailUsed = (): Promise<number> => {
     })
 }
 
+export const getUserInfo = (correo: string) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const user = await db.jrn_persona.findFirst({
+                where: {
+                    correo: correo.trim()
+                },
+                select: {
+                    id: true,
+                    acronimo: true,
+                    nombre: true,
+                    categoria: true,
+                    correo: true,
+                    rfc: true,
+                    tel: true,
+                    ciudad: true,
+                    dependencia: true,
+                }
+            });
+
+            resolve(user);
+        } catch (error) {
+            reject(error);
+        }
+    })
+}
+
 export const validateRecaptcha = async (token: string) => {
     try {
         const res = await axios.post('https://www.google.com/recaptcha/api/siteverify', null, {
