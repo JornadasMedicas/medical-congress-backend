@@ -33,8 +33,8 @@ export const createInsertionQuery = ({ ...props }: PropsSendRegistMailInterface,
                         dependencia: props.dependencia === '' ? null : props.dependencia,
                         created_at: moment.utc().subtract(6, 'hour').toISOString(), //gmt -6
                         updated_at: moment.utc().subtract(6, 'hour').toISOString(),
-                        qr_enviado: true,
-                        clabe_enviada: true,
+                        qr_enviado: props.isPreRegist ? false : true,
+                        clabe_enviada: props.isPreRegist ? false : true,
                         qr_enviado_at: moment.utc().subtract(6, 'hour').toISOString(),
                         clabe_enviada_at: moment.utc().subtract(6, 'hour').toISOString(),
                         email_registro: email[0].user,
@@ -140,6 +140,80 @@ export const getEmailUsed = (): Promise<number> => {
                         email = 3
                     }
                     resolve(email);
+                }
+            }
+        } catch (error) {
+            reject(error);
+        }
+    })
+}
+
+export const getUserInfo = (correo: string) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const user = await db.jrn_persona.findFirst({
+                where: {
+                    correo: correo.trim()
+                },
+                select: {
+                    id: true,
+                    acronimo: true,
+                    nombre: true,
+                    categoria: true,
+                    correo: true,
+                    rfc: true,
+                    tel: true,
+                    ciudad: true,
+                    dependencia: true,
+                }
+            });
+
+            resolve(user);
+        } catch (error) {
+            reject(error);
+        }
+    })
+}
+
+export const preRegisterUser = (response: any) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const currentYear: string = moment.utc().format('YYYY');
+
+            const repeated: any = await db.jrn_persona.findFirst({
+                where: {
+                    correo: response.correo.trim(),
+                    created_at: {
+                        gte: moment.utc(currentYear).toISOString(),
+                        lt: moment.utc(currentYear).add(1, 'year').toISOString()
+                    }
+                }
+            });
+
+            if (repeated) {
+                resolve({}); //duplicated entry
+            } else {
+                const user = await db.jrn_persona.create({
+                    data: {
+                        acronimo: response.acronimo.trim(),
+                        nombre: response.nombre.trim(),
+                        categoria: response.categoria.trim(),
+                        correo: response.correo.trim(),
+                        rfc: response.rfc ? response.rfc.trim() : null,
+                        tel: response.tel.trim(),
+                        ciudad: response.ciudad.trim(),
+                        dependencia: response.dependencia ? response.dependencia.trim() : null,
+                        qr_enviado: false,
+                        clabe_enviada: false,
+                        created_at: moment.utc().subtract(6, 'hour').toISOString(), //gmt -6
+                        updated_at: moment.utc().subtract(6, 'hour').toISOString(),
+                    }
+                });
+
+                if (user) { //if person was registered successfully
+                    resolve(user);
+                } else {
+                    resolve(null);
                 }
             }
         } catch (error) {
