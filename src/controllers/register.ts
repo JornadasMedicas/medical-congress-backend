@@ -189,7 +189,7 @@ export const sendPreRegistMail = async (req: any, res: any) => {
                     });
                 }
 
-                const insert: any = await preRegisterUser(response);
+                
 
                 /* if (Object.keys(response).length === 0) { //if email is already registered
                     res.status(409).json({
