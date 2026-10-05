@@ -24,4 +24,5 @@ export interface PropsSendRegistMailInterface {
     modulo: number;
     talleres: PropsTalleresInterface[];
     recaptchaToken: string;
+    isPreRegist: boolean;
 }

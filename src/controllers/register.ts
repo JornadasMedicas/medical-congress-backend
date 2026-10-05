@@ -73,43 +73,64 @@ export const sendRegistMail = async (req: any, res: any) => {
                         msg: 'No se ha podido procesar su solicitud. Intente mas tarde. (400)'
                     });
                 } else { //if all transactions were successfully done
-                    const rutaLogo: string = path.join(__dirname, `../../public/cae_logo.png`);
-                    const rutaQr: string = await generateQr(data, rutaLogo); //generate and save qr code on public folder
                     let htmlTemplate: string = '';
 
-                    if (!response.jrn_inscritos_modulos[0].jrn_edicion.gratuito) { // if congress isn't free
-                        htmlTemplate = fs.readFileSync(path.join(__dirname, '../templates', 'emailPreRegistro.html'), 'utf8');
-                        const costo: string = data.categoria.includes('Estudiante') ? '200' : response.jrn_inscritos_modulos[0].jrn_modulo.costo;
-                        htmlTemplate = htmlTemplate.replace(/{{costo}}/g, costo);
+                    if (data.isPreRegist) {
+                        htmlTemplate = fs.readFileSync(path.join(__dirname, '../templates', 'emailPreRegistroNoCosto.html'), 'utf8');
+                        htmlTemplate = htmlTemplate.replace(/{{acronimo}}/g, data.acronimo.trim());
+                        htmlTemplate = htmlTemplate.replace(/{{nombre}}/g, data.nombre.trim());
+                        htmlTemplate = htmlTemplate.replace(/{{aniversario}}/g, (parseInt(moment.utc().format('YYYY')) - 1989).toString());
+
+                        const info: SMTPTransport.SentMessageInfo = await transporter.sendMail({
+                            from: `"Centro de Alta Especialidad Dr. Rafael Lucio" <${email[0].user}>`, // sender address
+                            to: `${data.correo.trim()}`, // main receiver
+                            subject: `JORNADAS MÉDICAS ${moment.utc().format('YYYY')}`, // Subject line
+                            html: htmlTemplate
+                        });
+
+                        res.status(200).json({
+                            ok: true,
+                            msg: 'ok',
+                            data: info.response
+                        });
                     } else {
-                        htmlTemplate = fs.readFileSync(path.join(__dirname, '../templates', 'emailRegistroNoCosto.html'), 'utf8');
+                        const rutaLogo: string = path.join(__dirname, `../../public/cae_logo.png`);
+                        const rutaQr: string = await generateQr(data, rutaLogo); //generate and save qr code on public folder
+
+                        if (!response.jrn_inscritos_modulos[0].jrn_edicion.gratuito) { // if congress isn't free
+                            htmlTemplate = fs.readFileSync(path.join(__dirname, '../templates', 'emailPreRegistro.html'), 'utf8');
+                            const costo: string = data.categoria.includes('Estudiante') ? '200' : response.jrn_inscritos_modulos[0].jrn_modulo.costo;
+                            htmlTemplate = htmlTemplate.replace(/{{costo}}/g, costo);
+                        } else {
+                            htmlTemplate = fs.readFileSync(path.join(__dirname, '../templates', 'emailRegistroNoCosto.html'), 'utf8');
+                        }
+
+                        htmlTemplate = htmlTemplate.replace(/{{acronimo}}/g, data.acronimo.trim());
+                        htmlTemplate = htmlTemplate.replace(/{{nombre}}/g, data.nombre.trim());
+                        htmlTemplate = htmlTemplate.replace(/{{apellido}}/g, data.apellidos.trim());
+                        htmlTemplate = htmlTemplate.replace(/{{aniversario}}/g, (parseInt(moment.utc().format('YYYY')) - 1989).toString());
+                        htmlTemplate = htmlTemplate.replace(/{{modulo}}/g, response.jrn_inscritos_modulos[0].jrn_modulo.nombre);
+                        htmlTemplate = htmlTemplate.replace(/{{talleres}}/g, data.talleres.length > 0 ? `<p style="font-weight: bold; font-size:16px;">Talleres Seleccionados: <span style="font-weight: 100;">${data.talleres.map(taller => taller.nombre).join(', ')}</span></p>` : '');
+
+                        const info: SMTPTransport.SentMessageInfo = await transporter.sendMail({
+                            from: `"Centro de Alta Especialidad Dr. Rafael Lucio" <${email[0].user}>`, // sender address
+                            to: `${data.correo.trim()}`, // main receiver
+                            subject: `JORNADAS MÉDICAS ${moment.utc().format('YYYY')}`, // Subject line
+                            html: htmlTemplate,
+                            attachments: [
+                                {
+                                    filename: `${data.correo}.png`,
+                                    path: rutaQr
+                                }
+                            ]
+                        });
+
+                        res.status(200).json({
+                            ok: true,
+                            msg: 'ok',
+                            data: info.response
+                        });
                     }
-
-                    htmlTemplate = htmlTemplate.replace(/{{acronimo}}/g, data.acronimo.trim());
-                    htmlTemplate = htmlTemplate.replace(/{{nombre}}/g, data.nombre.trim());
-                    htmlTemplate = htmlTemplate.replace(/{{apellido}}/g, data.apellidos.trim());
-                    htmlTemplate = htmlTemplate.replace(/{{aniversario}}/g, (parseInt(moment.utc().format('YYYY')) - 1989).toString());
-                    htmlTemplate = htmlTemplate.replace(/{{modulo}}/g, response.jrn_inscritos_modulos[0].jrn_modulo.nombre);
-                    htmlTemplate = htmlTemplate.replace(/{{talleres}}/g, data.talleres.length > 0 ? `<p style="font-weight: bold; font-size:16px;">Talleres Seleccionados: <span style="font-weight: 100;">${data.talleres.map(taller => taller.nombre).join(', ')}</span></p>` : '');
-
-                    const info: SMTPTransport.SentMessageInfo = await transporter.sendMail({
-                        from: `"Centro de Alta Especialidad Dr. Rafael Lucio" <${email[0].user}>`, // sender address
-                        to: `${data.correo.trim()}`, // main receiver
-                        subject: `JORNADAS MÉDICAS ${moment.utc().format('YYYY')}`, // Subject line
-                        html: htmlTemplate,
-                        attachments: [
-                            {
-                                filename: `${data.correo}.png`,
-                                path: rutaQr
-                            }
-                        ]
-                    });
-
-                    res.status(200).json({
-                        ok: true,
-                        msg: 'ok',
-                        data: info.response
-                    });
                 }
             }
         }
@@ -124,7 +145,7 @@ export const sendRegistMail = async (req: any, res: any) => {
 
 export const sendPreRegistMail = async (req: any, res: any) => {
     try {
-        const data: { correo: string, recaptchaToken: string, isFormComplete: boolean } = req.body;
+        const data: { correo: string, recaptchaToken: string } = req.body;
         const emailNumber: number = await getEmailUsed();
 
         if (emailNumber === 0) {
@@ -176,8 +197,8 @@ export const sendPreRegistMail = async (req: any, res: any) => {
                 //si la conexión con el servidor es exitosa obtenemos info del usuario
                 const response: any = await getUserInfo(data.correo);
 
-                if (!response && data.isFormComplete === false) {
-                    res.status(404).json({
+                if (!response) {
+                    return res.status(404).json({
                         ok: false,
                         msg: 'No se ha encontrado información del asistente. Por favor complete el formulario. (404)'
                     });
