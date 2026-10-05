@@ -1,0 +1,17 @@
+volumes:
+  jornadas-storage:
+    driver: local
+
+networks:
+  cae-services:
+    external: true
+
+services:
+  backend:
+    image: registrygitlab.ssaver.gob.mx/jornadas-medicas/jornadas_back/app:latest-test
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+    deploy:
+      replicas: 1
+    networks:
+      - cae-services

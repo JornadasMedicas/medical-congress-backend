@@ -1,0 +1,29 @@
+include:
+    project: 'gitlab/gitlab-ci-templates'
+    ref: feature/jornadas
+    file: '/docker-build-jornadas.yaml'
+
+variables:
+    DEPLOY_USER_PRE: sica118
+    DEPLOY_HOST_PRE: 10.30.0.118
+
+build-app:
+    extends: .build-common
+    variables:
+        IMAGE_NAME: jornadas2026/jornadasmedicas
+        DOCKERFILE: 'infra/Dockerfile_back'
+        ENV_PRE: $DOT_ENV_PRE
+        ENV_PROD: $DOT_ENV_PROD
+        ENV_FILE_TO_BUILD: '.env_back'
+        IMAGE_TAG_DOCKER: 'back'
+    artifacts:
+        reports:
+            dotenv: image.env
+
+deploy-app-pre:
+    extends: .deploy-pre
+    needs:
+        - job: build-app
+          artifacts: true
+    variables:
+        SERVICE_NAME: 'api-jornadaspre_backend'

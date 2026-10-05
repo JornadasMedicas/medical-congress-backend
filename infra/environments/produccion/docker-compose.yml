@@ -1,0 +1,18 @@
+volumes:
+  jornadas-storage:
+    driver: local
+
+networks:
+  cae-services:
+    external: true
+
+
+services:
+  backend:
+    image: jornadas2026/jornadasmedicas:back
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+    deploy:
+      replicas: 1
+    networks:
+      - cae-services
