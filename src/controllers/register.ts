@@ -60,7 +60,7 @@ export const sendRegistMail = async (req: any, res: any) => {
                 });
             } else {
                 //si la conexión con el servidor es exitosa y la solicitud es legítima podemos hacer inserciones en la DB
-                /* const response: any = await createInsertionQuery(data, email);
+                const response: any = await createInsertionQuery(data, email);
 
                 if (Object.keys(response).length === 0) { //if email is already registered
                     res.status(409).json({
@@ -110,13 +110,7 @@ export const sendRegistMail = async (req: any, res: any) => {
                         msg: 'ok',
                         data: info.response
                     });
-                } */
-
-                res.status(200).json({
-                    ok: true,
-                    msg: 'ok',
-                    data: 'ok'
-                });
+                }
             }
         }
     } catch (error) {
