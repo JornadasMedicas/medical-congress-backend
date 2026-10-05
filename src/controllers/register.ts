@@ -187,12 +187,6 @@ export const sendPreRegistMail = async (req: any, res: any) => {
                         ok: false,
                         msg: 'No se ha encontrado información del asistente. Por favor complete el formulario. (404)'
                     });
-                } else {
-                    res.status(200).json({
-                        ok: true,
-                        msg: 'ok',
-                        data: response
-                    });
                 }
 
                 /* if (Object.keys(response).length === 0) { //if email is already registered
