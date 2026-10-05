@@ -175,6 +175,33 @@ export const getUserInfo = (correo: string) => {
     })
 }
 
+export const preRegisterUser = (response: any) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const user = await db.jrn_persona.create({
+                data: {
+                    acronimo: response.acronimo.trim(),
+                    nombre: response.nombre.trim(),
+                    categoria: response.categoria.trim(),
+                    correo: response.correo.trim(),
+                    rfc: response.rfc.trim(),
+                    tel: response.tel.trim(),
+                    ciudad: response.ciudad.trim(),
+                    dependencia: response.dependencia.trim(),
+                    qr_enviado: false,
+                    clabe_enviada: false,
+                    created_at: moment.utc().subtract(6, 'hour').toISOString(), //gmt -6
+                    updated_at: moment.utc().subtract(6, 'hour').toISOString(),
+                }
+            });
+
+            resolve(user);
+        } catch (error) {
+            reject(error);
+        }
+    })
+}
+
 export const validateRecaptcha = async (token: string) => {
     try {
         const res = await axios.post('https://www.google.com/recaptcha/api/siteverify', null, {

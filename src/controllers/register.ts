@@ -3,7 +3,7 @@ import SMTPTransport from "nodemailer/lib/smtp-transport";
 import { PropsSendRegistMailInterface } from "../interfaces/IRegister";
 import path from 'path';
 import { generateQr } from "../helpers/canvasQrGenerate";
-import { createInsertionQuery, getEmailUsed, getUserInfo, validateRecaptcha } from "../helpers/registerQueries";
+import { createInsertionQuery, getEmailUsed, getUserInfo, preRegisterUser, validateRecaptcha } from "../helpers/registerQueries";
 import { infoEmails } from "../helpers/emailsData";
 import moment from "moment";
 import fs from 'fs';
@@ -188,6 +188,8 @@ export const sendPreRegistMail = async (req: any, res: any) => {
                         msg: 'No se ha encontrado información del asistente. Por favor complete el formulario. (404)'
                     });
                 }
+
+                const insert: any = await preRegisterUser(response);
 
                 /* if (Object.keys(response).length === 0) { //if email is already registered
                     res.status(409).json({
