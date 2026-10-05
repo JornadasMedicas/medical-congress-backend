@@ -159,6 +159,7 @@ export const getUserInfo = (correo: string) => {
                     id: true,
                     acronimo: true,
                     nombre: true,
+                    apellidos: true,
                     categoria: true,
                     correo: true,
                     rfc: true,
@@ -178,24 +179,44 @@ export const getUserInfo = (correo: string) => {
 export const preRegisterUser = (response: any) => {
     return new Promise(async (resolve, reject) => {
         try {
-            const user = await db.jrn_persona.create({
-                data: {
-                    acronimo: response.acronimo.trim(),
-                    nombre: response.nombre.trim(),
-                    categoria: response.categoria.trim(),
+            const currentYear: string = moment.utc().format('YYYY');
+
+            const repeated: any = await db.jrn_persona.findFirst({
+                where: {
                     correo: response.correo.trim(),
-                    rfc: response.rfc.trim(),
-                    tel: response.tel.trim(),
-                    ciudad: response.ciudad.trim(),
-                    dependencia: response.dependencia.trim(),
-                    qr_enviado: false,
-                    clabe_enviada: false,
-                    created_at: moment.utc().subtract(6, 'hour').toISOString(), //gmt -6
-                    updated_at: moment.utc().subtract(6, 'hour').toISOString(),
+                    created_at: {
+                        gte: moment.utc(currentYear).toISOString(),
+                        lt: moment.utc(currentYear).add(1, 'year').toISOString()
+                    }
                 }
             });
 
-            resolve(user);
+            if (repeated) {
+                resolve({}); //duplicated entry
+            } else {
+                const user = await db.jrn_persona.create({
+                    data: {
+                        acronimo: response.acronimo.trim(),
+                        nombre: response.nombre.trim(),
+                        categoria: response.categoria.trim(),
+                        correo: response.correo.trim(),
+                        rfc: response.rfc.trim(),
+                        tel: response.tel.trim(),
+                        ciudad: response.ciudad.trim(),
+                        dependencia: response.dependencia.trim(),
+                        qr_enviado: false,
+                        clabe_enviada: false,
+                        created_at: moment.utc().subtract(6, 'hour').toISOString(), //gmt -6
+                        updated_at: moment.utc().subtract(6, 'hour').toISOString(),
+                    }
+                });
+
+                if (user) { //if person was registered successfully
+                    resolve(user);
+                } else {
+                    resolve(null);
+                }
+            }
         } catch (error) {
             reject(error);
         }
