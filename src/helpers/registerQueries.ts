@@ -35,8 +35,8 @@ export const createInsertionQuery = ({ ...props }: PropsSendRegistMailInterface,
                         updated_at: moment.utc().subtract(6, 'hour').toISOString(),
                         qr_enviado: props.isPreRegist ? false : true,
                         clabe_enviada: props.isPreRegist ? false : true,
-                        qr_enviado_at: moment.utc().subtract(6, 'hour').toISOString(),
-                        clabe_enviada_at: moment.utc().subtract(6, 'hour').toISOString(),
+                        qr_enviado_at: props.isPreRegist ? null : moment.utc().subtract(6, 'hour').toISOString(),
+                        clabe_enviada_at: props.isPreRegist ? null : moment.utc().subtract(6, 'hour').toISOString(),
                         email_registro: email[0].user,
                         ...((props.modulo !== 0 && props.modulo !== null) && {
                             jrn_inscritos_modulos: {
@@ -175,7 +175,7 @@ export const getUserInfo = (correo: string) => {
     })
 }
 
-export const preRegisterUser = (response: any) => {
+export const preRegisterUser = (response: any, email: any) => {
     return new Promise(async (resolve, reject) => {
         try {
             const currentYear: string = moment.utc().format('YYYY');
@@ -183,6 +183,7 @@ export const preRegisterUser = (response: any) => {
             const repeated: any = await db.jrn_persona.findFirst({
                 where: {
                     correo: response.correo.trim(),
+                    email_registro: email[0].user,
                     created_at: {
                         gte: moment.utc(currentYear).toISOString(),
                         lt: moment.utc(currentYear).add(1, 'year').toISOString()
@@ -205,6 +206,8 @@ export const preRegisterUser = (response: any) => {
                         dependencia: response.dependencia ? response.dependencia.trim() : null,
                         qr_enviado: false,
                         clabe_enviada: false,
+                        qr_enviado_at: null,
+                        clabe_enviada_at: null,
                         created_at: moment.utc().subtract(6, 'hour').toISOString(), //gmt -6
                         updated_at: moment.utc().subtract(6, 'hour').toISOString(),
                     }
