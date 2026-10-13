@@ -16,13 +16,13 @@ export interface PropsSendRegistMailInterface {
     nombre: string;
     apellidos: string;
     rfc?: string;
-    correo: string;
     tel: string;
     ciudad: string;
     dependencia?: string;
-    edicion: number;
+    isPreRegist: boolean;
+    correo: string;
     modulo: number;
     talleres: PropsTalleresInterface[];
+    edicion: number;
     recaptchaToken: string;
-    isPreRegist: boolean;
 }

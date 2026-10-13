@@ -183,7 +183,6 @@ export const preRegisterUser = (response: any, email: any) => {
             const repeated: any = await db.jrn_persona.findFirst({
                 where: {
                     correo: response.correo.trim(),
-                    email_registro: email[0].user,
                     created_at: {
                         gte: moment.utc(currentYear).toISOString(),
                         lt: moment.utc(currentYear).add(1, 'year').toISOString()
@@ -215,6 +214,78 @@ export const preRegisterUser = (response: any, email: any) => {
                 });
 
                 if (user) { //if person was registered successfully
+                    resolve(user);
+                } else {
+                    resolve(null);
+                }
+            }
+        } catch (error) {
+            reject(error);
+        }
+    })
+}
+
+export const completePreRegistration = ({ ...props }: PropsSendRegistMailInterface) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const currentYear: string = moment.utc().format('YYYY');
+
+            const assistant: any = await db.jrn_persona.findFirst({
+                where: {
+                    correo: props.correo,
+                    created_at: {
+                        gte: moment.utc(currentYear).toISOString(),
+                        lt: moment.utc(currentYear).add(1, 'year').toISOString()
+                    },
+                },
+                select: { id: true }
+            });
+
+            if (!assistant) {
+                resolve({}); //not found
+            } else {
+                const user = await db.jrn_persona.update({
+                    where: { id: assistant.id },
+                    data: {
+                        ...((props.modulo !== 0 && props.modulo !== null) && {
+                            jrn_inscritos_modulos: {
+                                create: {
+                                    asistioDia1: false,
+                                    asistioDia2: false,
+                                    asistioDia3: false,
+                                    constancia_enviada: false,
+                                    id_edicion: props.edicion,
+                                    id_modulo: props.modulo,
+                                },
+                            },
+                        }),
+                        ...(props.talleres.length > 0 && {
+                            jrn_inscritos_talleres: {
+                                createMany: {
+                                    data: props.talleres.map(taller => ({
+                                        asistio: false,
+                                        constancia_enviada: false,
+                                        id_taller: taller.id_taller,
+                                        created_at: moment.utc().subtract(6, 'hour').toISOString(),
+                                    })),
+                                },
+                            },
+                        }),
+                    },
+                    select: {
+                        jrn_inscritos_modulos: {
+                            select: {
+                                jrn_modulo: { select: { nombre: true, costo: true } },
+                                jrn_edicion: { select: { gratuito: true } },
+                            },
+                        },
+                        categoria: true,
+                        acronimo: true,
+                        nombre: true,
+                    },
+                });
+
+                if (user) { //if person was updated successfully
                     resolve(user);
                 } else {
                     resolve(null);
