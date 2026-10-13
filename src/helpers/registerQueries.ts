@@ -208,6 +208,7 @@ export const preRegisterUser = (response: any, email: any) => {
                         clabe_enviada: false,
                         qr_enviado_at: null,
                         clabe_enviada_at: null,
+                        email_registro: email[0].user,
                         created_at: moment.utc().subtract(6, 'hour').toISOString(), //gmt -6
                         updated_at: moment.utc().subtract(6, 'hour').toISOString(),
                     }

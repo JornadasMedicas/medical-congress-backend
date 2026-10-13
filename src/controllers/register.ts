@@ -78,8 +78,7 @@ export const sendRegistMail = async (req: any, res: any) => {
                     if (data.isPreRegist) {
                         htmlTemplate = fs.readFileSync(path.join(__dirname, '../templates', 'emailPreRegistroNoCosto.html'), 'utf8');
                         htmlTemplate = htmlTemplate.replace(/{{acronimo}}/g, data.acronimo.trim());
-                        htmlTemplate = htmlTemplate.replace(/{{nombre}}/g, data.nombre.trim());
-                        htmlTemplate = htmlTemplate.replace(/{{apellidos}}/g, data.apellidos.trim());
+                        htmlTemplate = htmlTemplate.replace(/{{nombre}}/g, data.nombre.trim() + ' ' + data.apellidos.trim());
                         htmlTemplate = htmlTemplate.replace(/{{aniversario}}/g, (parseInt(moment.utc().format('YYYY')) - 1989).toString());
 
                         const info: SMTPTransport.SentMessageInfo = await transporter.sendMail({
