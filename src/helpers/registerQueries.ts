@@ -233,6 +233,7 @@ export const completePreRegistration = ({ ...props }: PropsSendRegistMailInterfa
             const assistant: any = await db.jrn_persona.findFirst({
                 where: {
                     correo: props.correo,
+                    qr_enviado: false,
                     created_at: {
                         gte: moment.utc(currentYear).toISOString(),
                         lt: moment.utc(currentYear).add(1, 'year').toISOString()
@@ -247,6 +248,7 @@ export const completePreRegistration = ({ ...props }: PropsSendRegistMailInterfa
                 const user = await db.jrn_persona.update({
                     where: { id: assistant.id },
                     data: {
+                        qr_enviado: true,
                         ...((props.modulo !== 0 && props.modulo !== null) && {
                             jrn_inscritos_modulos: {
                                 create: {

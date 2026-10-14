@@ -306,7 +306,7 @@ export const completePreRegistMail = async (req: any, res: any) => {
                 if (Object.keys(response).length === 0) { //if there's no assistant registered
                     res.status(409).json({
                         ok: false,
-                        msg: 'No se ha encontrado el usuario.'
+                        msg: 'El usuario no ha sido encontrado como pre-registro o ya ha sido registrado. (409)'
                     });
                 } else if (response === null) { //if there were no success transactions
                     res.status(400).json({
