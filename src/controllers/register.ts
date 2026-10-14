@@ -3,12 +3,13 @@ import SMTPTransport from "nodemailer/lib/smtp-transport";
 import { PropsSendRegistMailInterface } from "../interfaces/IRegister";
 import path from 'path';
 import { generateQr } from "../helpers/canvasQrGenerate";
-import { completePreRegistration, createInsertionQuery, getEmailUsed, getUserInfo, preRegisterUser, validateRecaptcha } from "../helpers/registerQueries";
+import { completePreRegistration, createInsertionQuery, getEmailUsed, getUserInfo, preRegisterUser, validateRecaptcha, verifyPreRegUser } from "../helpers/registerQueries";
 import { infoEmails } from "../helpers/emailsData";
+import { Request, Response } from 'express';
 import moment from "moment";
 import fs from 'fs';
 
-export const sendRegistMail = async (req: any, res: any) => {
+export const sendRegistMail = async (req: Request, res: Response) => {
     try {
         const data: PropsSendRegistMailInterface = req.body;
         const emailNumber: number = await getEmailUsed();
@@ -143,7 +144,7 @@ export const sendRegistMail = async (req: any, res: any) => {
     }
 }
 
-export const sendPreRegistMail = async (req: any, res: any) => {
+export const sendPreRegistMail = async (req: Request, res: Response) => {
     try {
         const data: { correo: string, recaptchaToken: string } = req.body;
         const emailNumber: number = await getEmailUsed();
@@ -249,7 +250,7 @@ export const sendPreRegistMail = async (req: any, res: any) => {
     }
 }
 
-export const completePreRegistMail = async (req: any, res: any) => {
+export const completePreRegistMail = async (req: Request, res: Response) => {
     try {
         const data: PropsSendRegistMailInterface = req.body;
         const emailNumber: number = await getEmailUsed();
@@ -359,6 +360,29 @@ export const completePreRegistMail = async (req: any, res: any) => {
         res.status(500).json({
             ok: false,
             msg: 'Ha habido un error. Intente de nuevo más tarde. (500)'
+        });
+    }
+}
+
+export const verifyPreRegisteredUser = async (req: Request, res: Response) => {
+    const { email } = req.body;
+
+    const response: any = await verifyPreRegUser(email);
+
+    if (response === null) {
+        res.status(409).json({
+            ok: false,
+            msg: 'El usuario no ha sido encontrado como pre-registro o ya ha sido registrado. (409)'
+        });
+    } else if (response) {
+        res.status(200).json({
+            ok: true,
+            msg: 'ok'
+        });
+    } else {
+        res.status(400).json({
+            ok: false,
+            msg: 'No se ha podido procesar su solicitud. Intente mas tarde. (400)'
         });
     }
 }

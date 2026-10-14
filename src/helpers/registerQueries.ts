@@ -225,6 +225,33 @@ export const preRegisterUser = (response: any, email: any) => {
     })
 }
 
+export const verifyPreRegUser = async (email: string) => {
+    try {
+        const currentYear: string = moment.utc().format('YYYY');
+
+        const assistant: any = await db.jrn_persona.findFirst({
+            where: {
+                correo: email,
+                qr_enviado: false,
+                created_at: {
+                    gte: moment.utc(currentYear).toISOString(),
+                    lt: moment.utc(currentYear).add(1, 'year').toISOString()
+                },
+            }
+        });
+
+        if (assistant) {
+            return true;
+        } else {
+            return null;
+        }
+
+    } catch (error) {
+        console.log(error);
+        return false;
+    }
+}
+
 export const completePreRegistration = ({ ...props }: PropsSendRegistMailInterface) => {
     return new Promise(async (resolve, reject) => {
         try {

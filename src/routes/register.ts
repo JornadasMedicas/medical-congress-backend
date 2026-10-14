@@ -1,10 +1,11 @@
 import { Router } from "express";
-import { completePreRegistMail, sendPreRegistMail, sendRegistMail } from "../controllers/register";
+import { completePreRegistMail, sendPreRegistMail, sendRegistMail, verifyPreRegisteredUser } from "../controllers/register";
 
 const router: Router = Router();
 
 router.post('/mail', sendRegistMail);
 router.post('/pre', sendPreRegistMail);
 router.post('/pre/complete', completePreRegistMail);
+router.post('/pre/verify', verifyPreRegisteredUser)
 
 export default router;
